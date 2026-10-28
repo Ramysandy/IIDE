@@ -2,7 +2,7 @@ PY ?= .venv/bin/python
 TESTBED ?= billing_api
 TESTBEDS ?= billing_api file_portal
 
-.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all
+.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score
 
 install:
 	python3 -m venv .venv
@@ -37,3 +37,7 @@ baseline:
 
 baseline-all:
 	for tb in $(TESTBEDS); do $(PY) scripts/run_baseline.py --testbed $$tb $(FORCE) || exit 1; done
+
+# Score a replay ledger against the baseline (default: baseline self-comparison check).
+score:
+	$(PY) scripts/score_replays.py --testbed $(TESTBED)

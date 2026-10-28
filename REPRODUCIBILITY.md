@@ -1,4 +1,4 @@
-# Reproducibility (Phase 2, experiment version `phase2-0.1`)
+# Reproducibility (Phase 3; replay experiment version `phase2-0.1`)
 
 ## Environment
 
@@ -19,6 +19,7 @@ make testbed-validate                          # cross-validate every testbed; p
 make baseline TESTBED=file_portal              # one testbed: k=5 per attack, 5 benign replays, 30 calibration replays per attack
 make baseline-all                              # both testbeds (about 20 minutes)
 make baseline-all FORCE=--force                # re-record (only when intentionally creating a new baseline)
+make score TESTBED=file_portal                 # score a ledger vs the baseline; default is a self-comparison check
 ```
 
 Direct equivalents:
@@ -41,6 +42,14 @@ In `testbeds/<tb>/baseline/`:
 | `baseline_replay_runs.jsonl` | One `ReplayRecord` per baseline replay (the replay ledger) |
 | `baseline_coverage.json` | Per-attack detection status, set A0, per-attack flake rates, unexpected (cross-fired) rules, negative-control result, frozen hashes (incl. `benign_set_hash`), environment, isolation level, functional-test result |
 | `flake_calibration_runs.jsonl`, `flake_calibration.json` | Larger replay batch used only to measure flake rate |
+
+## Scoring
+
+`scripts/score_replays.py --testbed T [--candidate ledger.jsonl] [--output-dir D]` scores a replay ledger
+against `testbeds/T/baseline/baseline_replay_runs.jsonl` and writes `coverage_report.{md,json}`. Without
+`--candidate` it compares the baseline with itself (RC=1, ED=0, LEI=0), which checks the pipeline and is
+not a result. Every report carries `scoring_package_hash` (hash of `iide/scoring/*.py`). The scoring code
+is outside the frozen replay hashes, so it does not invalidate the baselines.
 
 ## Freeze policy
 

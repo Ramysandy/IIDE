@@ -4,7 +4,7 @@ Authoritative source: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Suppor
 proposal review, novelty check) are in [`docs/`](docs/). Engineering choices are recorded in
 [`DECISIONS.md`](DECISIONS.md).
 
-**Status legend:** `[x]` done and verified, `[ ]` not started. Nothing past Phase 2 is implemented.
+**Status legend:** `[x]` done and verified, `[ ]` not started. Nothing past Phase 3 is implemented.
 
 ## Repository state at start of Phase 1
 
@@ -18,7 +18,7 @@ no tests, not a git repository.
 | 0 | Prior-art sweep, novelty matrix, go/no-go memo | **G1** | `[ ]` Not done. **Novelty is not established.** |
 | 1 | Minimal vertical slice: one endpoint, telemetry, one safe attack, one frozen rule, fresh-instance replay, baseline JSON | Rule fires consistently; flake rate under pilot threshold | `[x]` see below |
 | 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 open** (needs human annotators) |
-| 3 | Scoring library (RC, ED, LEI, IAE, IIF, SR, DG, CAI, ISP, NRG, Pareto), section 9 fixtures | Unit tests match hand calculations | `[ ]` |
+| 3 | Scoring library (RC, ED, LEI, IAE, IIF, SR, DG, CAI, ISP, NRG, Pareto), section 9 fixtures | Unit tests match hand calculations | `[x]` implemented and tested; bootstrap CIs deferred to Phase 7 |
 | 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[ ]` |
 | 5 | Baselines and decision | **G4** | `[ ]` |
 | 6-7 | Scale or pivot; analysis and paper | | `[ ]` |
@@ -69,6 +69,17 @@ no tests, not a git repository.
 | Rule conditions | `iide/detection/json_rules.py`, `tests/unit/test_rule_conditions.py` |
 | Oracle checks | `tests/integration/test_testbeds_oracle.py`, `tests/integration/test_telemetry_removal.py` |
 | Baselines | `testbeds/<tb>/baseline/*` via `make baseline-all` |
+
+### Phase 3 task checklist
+
+- [x] RC, ED, LEI (+ unit-weight and rule-count sensitivity variants), detection debt (`iide/scoring/coverage.py`)
+- [x] IAE, IIF, SR over matched cells (`iide/scoring/causal.py`); DG (`disclosure.py`)
+- [x] Binary entropy, CAI, ISP posterior (`ambiguity.py`); NRG and Pareto frontier (`frontier.py`)
+- [x] Section 9 worked example as automated tests; explicit LEI exclusion test; boundary, validation and seeded property tests
+- [x] Replay-record adapter and report generator (`adapters.py`, `iide/analysis/reports.py`, `scripts/score_replays.py`)
+- [x] Scoring verified on real ledgers: baseline self-comparison and the Phase 2 telemetry-removal mutants
+- [ ] Not in scope: bootstrap intervals, mixed models, agent run-record scoring (Phases 4-7)
+- [ ] Open decisions: D-26 (UNKNOWN aggregation) and D-27 (redundancy across replays) need confirmation
 
 ## Dependencies between phases
 
