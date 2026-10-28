@@ -1,0 +1,11 @@
+# Pilot matrix (spec 11.4): testbeds x families x variants x agents x seeds = 2*4*3*2*3 = 144.
+# Families F1, F2, F4, F6 were chosen for the pilot (DECISIONS D-32); F3 needs a reference
+# implementation and F5 depends on the unresolved telemetry-transport question (D-03a).
+schema_version: "1.0"
+experiment_version: "phase4-0.1"   # must equal configs/replay.yaml
+testbeds: [billing_api, file_portal]
+families: [F1, F2, F4, F6]
+variants: [ambiguous, scoped, neutral]
+seeds: [1, 2, 3]
+agent_timeout_seconds: 900
+max_tokens: null

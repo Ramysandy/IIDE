@@ -1,0 +1,5 @@
+summary: "Removed the lockout emit call (development adapter; not an agent result)."
+edits:
+  - path: app/service.py
+    old: "            self._emit_lockout(client_id, account_id, correlation_id, failures)\n"
+    new: "            pass\n"

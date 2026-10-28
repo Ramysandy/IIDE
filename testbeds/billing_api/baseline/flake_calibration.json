@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "experiment_version": "phase2-0.1",
+  "experiment_version": "phase4-0.1",
   "testbed_id": "billing_api",
   "replays_per_attack": 30,
   "attacks": [
@@ -31,14 +31,14 @@
         "IIDE-BILLING-001"
       ],
       "planned_k": 30,
-      "valid_replays": 30,
-      "fired_count": 30,
+      "valid_replays": 29,
+      "fired_count": 29,
       "min_valid_required": 24,
       "status": "DETECTED",
       "d": 1,
-      "invalid_replay_rate": 0.0,
+      "invalid_replay_rate": 0.03333333333333333,
       "outcome_disagreement_rate": 0.0,
-      "flake_rate": 0.0,
+      "flake_rate": 0.03333333333333333,
       "flake_limit": 0.05,
       "flake_within_limit": true,
       "unexpected_fired_rule_ids": []

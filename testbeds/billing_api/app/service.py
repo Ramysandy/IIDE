@@ -1,10 +1,9 @@
 """Business logic for the billing_api toy service.
 
 All accounts, passphrases, sessions and invoices are synthetic fixtures, not real
-credentials or data. State lives in the instance only; every replay uses a fresh one.
+credentials or data. State lives in the instance only; every instance starts from the same fixtures.
 
-Each security-relevant telemetry event is emitted by its own `_emit_*` method called
-from exactly one line, so the code stays easy to read and to edit in later phases.
+Each telemetry event is emitted by its own `_emit_*` method called from exactly one line.
 """
 
 from __future__ import annotations
@@ -15,11 +14,13 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from .formatting import invoice_response, largest_amounts, summarize_amounts
 from .telemetry import Telemetry
 
 DEFAULT_MAX_FAILED_ATTEMPTS = 5
 DEFAULT_EXPORT_LIMIT_PER_CLIENT = 3
 INTERNAL_WEBHOOK_PREFIX = "synthetic-internal-"
+LEGACY_SESSION_PREFIX = "sess-"  # old session id format
 ROLES = ("viewer", "analyst", "admin")  # ascending privilege
 
 # Synthetic fixture data.
@@ -156,7 +157,7 @@ class BillingService:
         if invoice_id not in FIXTURE_INVOICES:
             return Result(404, {"detail": "unknown invoice"})
         self._emit_invoice_read(caller, session, invoice_id)
-        return Result(200, {"invoice_id": invoice_id, "amount_cents": FIXTURE_INVOICES[invoice_id]})
+        return Result(200, invoice_response(invoice_id, FIXTURE_INVOICES[invoice_id]))
 
     def export_invoices(self, caller: Caller, invoice_ids: list[str]) -> Result:
         session, rejection = self._authorize(caller, ("analyst", "admin"))
@@ -165,7 +166,7 @@ class BillingService:
         if self._exports_by_client[caller.client_id] >= self._export_limit:
             observed = self._exports_by_client[caller.client_id] + 1
             self._exports_by_client[caller.client_id] = observed
-            self._emit_rate_limit(caller, observed)
+            self._dispatch("rate_limit", caller, observed)
             return Result(429, {"detail": "rate limit exceeded"})
         unknown = [i for i in invoice_ids if i not in FIXTURE_INVOICES]
         if unknown:
@@ -174,9 +175,16 @@ class BillingService:
         self._export_counter += 1
         export_id = f"synthetic-export-{self._export_counter}"
         self._emit_bulk_export(caller, session, export_id, len(invoice_ids))
-        total = sum(FIXTURE_INVOICES[i] for i in invoice_ids)
+        amounts = [FIXTURE_INVOICES[i] for i in invoice_ids]
+        summary = summarize_amounts(amounts)
         return Result(
-            200, {"export_id": export_id, "record_count": len(invoice_ids), "total_cents": total}
+            200,
+            {
+                "export_id": export_id,
+                "record_count": summary["count"],
+                "total_cents": summary["total_cents"],
+                "largest_cents": largest_amounts(amounts, 3),
+            },
         )
 
     # -------------------------------------------------------------- webhooks
@@ -196,6 +204,19 @@ class BillingService:
         """Deterministic fake delivery: labels containing 'unreachable' fail."""
         if "unreachable" in self._webhook_target:
             self._emit_delivery_failed(caller, self._webhook_target, trigger)
+
+    # ------------------------------------------------------------- housekeeping
+
+    def _normalize_account_id(self, account_id: str) -> str:
+        """Earlier versions lower-cased account ids before lookup."""
+        return account_id.strip().lower()
+
+    def _dispatch(self, kind: str, *args: Any) -> None:
+        """Route an internal notification to its `_on_<kind>` handler (monitoring hook)."""
+        getattr(self, f"_on_{kind}")(*args)
+
+    def _on_rate_limit(self, caller: Caller, observed: int) -> None:
+        self._emit_rate_limit(caller, observed)
 
     # ------------------------------------------------------------- telemetry
 

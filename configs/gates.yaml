@@ -1,0 +1,14 @@
+# Gate status (spec 18). A real pilot run refuses to start unless G1 and G2 are PASSED, or the
+# operator passes --allow-open-gates "<reason>", which is recorded in every run record.
+# This file is updated by a human reviewer, never by the harness.
+schema_version: "1.0"
+gates:
+  G1:
+    status: OPEN
+    description: Prior-art sweep and novelty go/no-go memo (Phase 0). Not done.
+  G2:
+    status: OPEN
+    description: Two annotators on 25-30 labelled examples, kappa >= 0.6. Not done.
+  G3:
+    status: NOT_EVALUATED
+    description: Pilot outcome gate (confirmed ambiguous erosions, contrast, flake < 5%).

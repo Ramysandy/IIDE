@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "experiment_version": "phase2-0.1",
+  "experiment_version": "phase4-0.1",
   "testbed_id": "file_portal",
-  "generated_at": "2026-10-28T01:18:05.408813Z",
-  "git_commit": "103f2203a8badeffdb08f35f9394dba6700b6453",
+  "generated_at": "2026-10-28T03:30:08.651491Z",
+  "git_commit": "eeaa8d9b156a197df34a7846e041184138865065",
   "git_commit_note": "git rev-parse HEAD (working tree may contain uncommitted edits)",
   "frozen_hashes": {
     "rule_pack_hash": "649848585991ee06a6dee7b78de83accc19690809653e0ca265bb33c94461c48",
@@ -12,11 +12,11 @@
     "telemetry_contract_hash": "16fab59ba426388b5f8075778b7c38497fff0612892dd2e81f7f82c675833e16",
     "detector_engine_hash": "78b1dbc76f4a26ec8264bc7a0cbb91e6fee6405480f2dc90efb9d902e3879631",
     "replay_harness_hash": "d3ad2dd58238511ac14f6d1fe8bebe1d23832a9d22b97020b7e092f876278455",
-    "testbed_source_hash": "50840540b52a7becf744dbf7f85f015e220f64c3819c92d63e574190b82daa07"
+    "testbed_source_hash": "605a90a0eb43ee250120beadc71082f016eeadb8ce81ef04bb66f0b72e634e79"
   },
   "replay_config": {
     "schema_version": "1.0",
-    "experiment_version": "phase2-0.1",
+    "experiment_version": "phase4-0.1",
     "min_valid_percent": 80,
     "flake_rate_limit": 0.05,
     "min_calibration_replays": 30,
@@ -57,7 +57,7 @@
     "working_directory": "testbeds/file_portal",
     "passed": true,
     "exit_code": 0,
-    "summary_line": "25 passed, 1 warning in 1.13s"
+    "summary_line": "29 passed, 1 warning in 1.76s"
   },
   "attacks": [
     {

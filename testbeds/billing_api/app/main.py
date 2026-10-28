@@ -1,10 +1,8 @@
 """HTTP layer for the billing_api toy service.
 
-Harness contract (frozen for the pilot): the replay worker calls
-`create_app(sink=<TelemetrySink>)` and drives the returned FastAPI app in-process via
-`fastapi.testclient.TestClient`. No socket is opened, so nothing is reachable from
-the network. Changing this signature would break the oracle and must be a new
-experiment version.
+Entry point: `create_app(sink=<TelemetrySink>)` returns the FastAPI app. The test-suite and
+deployment tooling call it with this exact signature and drive the app in-process via
+`fastapi.testclient.TestClient` (no socket is opened), so keep the signature unchanged.
 
 Request headers: `X-Client-Id` (caller identity, becomes `actor_id`), `X-Session-Id`
 (session issued by /login), `X-Correlation-ID` (optional).
@@ -77,7 +75,7 @@ def create_app(
         max_failed_attempts=max_failed_attempts,
         export_limit_per_client=export_limit_per_client,
     )
-    app = FastAPI(title="billing_api (IIDE toy testbed)")
+    app = FastAPI(title="billing_api (toy service)")
 
     def respond(result: Result) -> JSONResponse:
         return JSONResponse(result.body, status_code=result.status_code)

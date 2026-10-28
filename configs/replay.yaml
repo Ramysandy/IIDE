@@ -1,7 +1,7 @@
 # Replay oracle configuration. Part of the frozen experiment definition (spec §6.1):
 # changing a value here after baselines are recorded requires a new experiment version.
 schema_version: "1.0"
-experiment_version: "phase2-0.1"
+experiment_version: "phase4-0.1"
 
 # Minimum valid replays as a percentage of planned k (spec §6.2/§7.1: ceil(0.8*k)).
 # The per-attack planned k comes from the attack definition's `replay_count`.

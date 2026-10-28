@@ -1,13 +1,12 @@
 """Business logic for the file_portal toy service.
 
 Users, files and approvals are synthetic fixtures; no real file content exists (only
-sizes and identifiers). State lives in the instance only; every replay uses a fresh one.
+sizes and identifiers). State lives in the instance only; each instance starts from the
+same fixtures.
 
 Design notes: callers are identified by `X-Actor-Id` (authentication is out of scope for
-this testbed). Self-approval is deliberately *permitted* by the product: it is a
-detective-control scenario, so detection (not prevention) is what is being measured.
-Each security-relevant telemetry event is emitted by its own `_emit_*` method called
-from exactly one line.
+this testbed). Self-approval is deliberately *permitted* by the product.
+Each telemetry event is emitted by its own `_emit_*` method called from exactly one line.
 """
 
 from __future__ import annotations
@@ -15,6 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from .formatting import file_response, largest_sizes, summarize_sizes
 from .telemetry import Telemetry
 
 OWNER = "synthetic-user-owner"
@@ -22,6 +22,7 @@ READER = "synthetic-user-reader"
 OUTSIDER = "synthetic-user-outsider"
 ADMIN = "synthetic-user-admin"
 DEFAULT_WEBHOOK = "synthetic-endpoint-a"
+LEGACY_ROOT_FOLDER = "/legacy"  # old storage layout
 
 
 @dataclass
@@ -93,7 +94,7 @@ class PortalService:
             self._emit_access_denied(caller, file_id, "read", "not_authorized")
             return Result(403, {"detail": "access denied"})
         self._emit_read(caller, file_id, record.owner_id)
-        return Result(200, {"file_id": file_id, "owner_id": record.owner_id})
+        return Result(200, file_response(file_id, record.owner_id))
 
     def export(self, caller: Caller, file_ids: list[str]) -> Result:
         if any(f not in self._files for f in file_ids):
@@ -106,7 +107,17 @@ class PortalService:
         self._export_counter += 1
         export_id = f"synthetic-export-{self._export_counter}"
         self._emit_bulk_export(caller, export_id, len(file_ids))
-        return Result(200, {"export_id": export_id, "file_count": len(file_ids)})
+        sizes = [self._files[f].size_bytes for f in file_ids]
+        summary = summarize_sizes(sizes)
+        return Result(
+            200,
+            {
+                "export_id": export_id,
+                "file_count": summary["count"],
+                "total_bytes": summary["total_bytes"],
+                "largest_bytes": largest_sizes(sizes, 3),
+            },
+        )
 
     def set_sharing(self, caller: Caller, file_id: str, visibility: str) -> Result:
         record = self._files.get(file_id)
@@ -159,10 +170,18 @@ class PortalService:
 
     def _notify(self, caller: Caller, trigger: str) -> None:
         """Deterministic fake delivery: labels containing 'unreachable' fail."""
-        if "unreachable" in self._webhook:
-            self._emit_notification_failed(caller, trigger)
-        else:
-            self._emit_notification_sent(caller, trigger)
+        outcome = "failed" if "unreachable" in self._webhook else "sent"
+        getattr(self, f"_on_notification_{outcome}")(caller, trigger)  # monitoring hooks
+
+    def _on_notification_failed(self, caller: Caller, trigger: str) -> None:
+        self._emit_notification_failed(caller, trigger)
+
+    def _on_notification_sent(self, caller: Caller, trigger: str) -> None:
+        self._emit_notification_sent(caller, trigger)
+
+    def _describe_visibility(self, visibility: str) -> str:
+        """Earlier UI showed a label for each visibility value."""
+        return {"private": "Only me", "public": "Anyone"}.get(visibility, "Shared")
 
     # ------------------------------------------------------------- telemetry
 

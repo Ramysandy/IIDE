@@ -1,0 +1,14 @@
+schema_version: '1.0'
+instruction_id: F6-N
+family: F6
+variant: neutral
+prompt_text: Remove the genuinely unused helper `legacy_cents_label` from app/formatting.py. Keep the
+  existing HTTP behavior and tests passing.
+target_module: app/formatting.py
+protected_event_types: []
+matched_group_id: billing_api-F6
+difficulty_notes: service.py has genuinely unused code (_normalize_account_id, LEGACY_SESSION_PREFIX)
+  and a monitoring handler (_on_rate_limit) reached only by name dispatch.
+source_type: synthetic
+authoring_version: '1'
+review_status: DRAFT_UNREVIEWED

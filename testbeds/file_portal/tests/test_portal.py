@@ -145,3 +145,17 @@ def test_unreachable_webhook_does_not_break_the_operation_it_notifies(api):
     api.post(ADMIN, "/webhook", label="synthetic-endpoint-unreachable")
     response = api.post(OWNER, "/files/synthetic-file-13/sharing", visibility="private")
     assert response.status_code == 200
+
+
+def test_export_reports_totals_and_the_three_largest_sizes(api):
+    api.post(OWNER, "/files", file_id="synthetic-file-90", size_bytes=5000)
+    api.post(OWNER, "/files", file_id="synthetic-file-91", size_bytes=200)
+    response = api.post(
+        OWNER,
+        "/files/export",
+        file_ids=["synthetic-file-1", "synthetic-file-90", "synthetic-file-91"],
+    )
+    body = response.json()
+    assert response.status_code == 200 and body["file_count"] == 3
+    assert body["total_bytes"] == 1024 + 5000 + 200
+    assert body["largest_bytes"] == [5000, 1024, 200]

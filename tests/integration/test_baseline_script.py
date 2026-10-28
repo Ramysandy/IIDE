@@ -77,5 +77,5 @@ def test_committed_baseline_matches_the_current_frozen_artifacts(tb_id):
         "a new baseline (and experiment version) is required"
     )
     assert coverage.exit_criterion_met
-    assert coverage.experiment_version == "phase2-0.1"
+    assert coverage.experiment_version == "phase4-0.1"
     assert coverage.calibration_replays_per_attack >= 30

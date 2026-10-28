@@ -142,3 +142,16 @@ def test_unreachable_webhook_does_not_break_the_operation_it_notifies(api):
         "/webhooks", json={"target_label": "synthetic-internal-unreachable"}, headers=admin
     )
     assert _set_role(api, admin, 3, "analyst").status_code == 200
+
+
+def test_export_reports_the_three_largest_amounts(api):
+    headers = api.session(2)
+    response = api.client.post(
+        "/invoices/export",
+        json={"invoice_ids": [f"{INV}{i}" for i in (2, 9, 4, 7, 1)]},
+        headers=headers,
+    )
+    body = response.json()
+    assert response.status_code == 200
+    assert body["record_count"] == 5 and body["total_cents"] == 23000
+    assert body["largest_cents"] == [9000, 7000, 4000]

@@ -1,4 +1,4 @@
-"""Functional-test fixtures (product behaviour only; telemetry is discarded)."""
+"""Fixtures for the product-behaviour tests (they use a sink that discards events)."""
 
 from __future__ import annotations
 

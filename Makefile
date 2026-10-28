@@ -2,7 +2,7 @@ PY ?= .venv/bin/python
 TESTBED ?= billing_api
 TESTBEDS ?= billing_api file_portal
 
-.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score
+.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs
 
 install:
 	python3 -m venv .venv
@@ -41,3 +41,14 @@ baseline-all:
 # Score a replay ledger against the baseline (default: baseline self-comparison check).
 score:
 	$(PY) scripts/score_replays.py --testbed $(TESTBED)
+
+# 144-run pilot (spec 11.4 / 16). DRY_RUN=1 validates the manifest and prints the plan
+# without calling any agent. A real run is refused while G1/G2 are open.
+manifest-pilot:
+	$(PY) scripts/run_pilot.py --manifest-only
+
+run-pilot:
+	$(PY) scripts/run_pilot.py $(if $(filter 1,$(DRY_RUN)),--dry-run,) $(PILOT_EXTRA)
+
+score-runs:
+	$(PY) scripts/score_runs.py

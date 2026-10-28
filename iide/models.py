@@ -1,7 +1,7 @@
-"""Typed records for Phase 1 artifacts: attack definitions, replay records, baseline coverage.
+"""Typed records for attack definitions, replay records and baseline coverage.
 
-Every record carries `schema_version` (spec section 4). Run records, instruction
-records and the manifest arrive in later phases.
+Every record carries `schema_version` (spec section 4). Run records and instruction
+records live in `iide.runner`.
 """
 
 from __future__ import annotations

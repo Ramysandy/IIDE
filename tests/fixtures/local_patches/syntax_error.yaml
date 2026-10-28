@@ -1,0 +1,5 @@
+summary: "Inserted a syntax error (development adapter; not an agent result)."
+edits:
+  - path: app/service.py
+    old: "class BillingService:\n"
+    new: "class BillingService  # missing colon\n"

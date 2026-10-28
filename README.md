@@ -4,12 +4,11 @@ A reproducible research harness for measuring whether ordinary maintenance instr
 agent to remove or degrade security telemetry that a frozen detection pipeline relies on, even when
 functional tests still pass.
 
-> **Status: Phase 3 (scoring library) on top of the Phase 2 testbeds.** `billing_api` and `file_portal`
-> (frozen rule packs, benign controls, baselines) plus `iide/scoring/` (RC, ED, LEI, IAE, IIF, SR, DG, CAI,
-> ISP, NRG, Pareto frontier) verified against the spec section 9 worked example. There is no agent runner
-> and no experimental result yet. Gate **G2** (inter-annotator kappa >= 0.6) is **not met**: criticality
-> weights, `security_bearing` labels and ATT&CK mappings are provisional single-annotator values. The
-> research gap has **not** been verified as novel; the Phase 0 prior-art gate (G1) is still open.
+> **Status: Phase 4 (agent harness) on top of the Phase 2 testbeds and Phase 3 scoring library.** The
+> 144-run manifest is generated and validated. A local-patch development adapter exercises the pipeline.
+> **No LLM has been called and no experimental result exists.** Gate **G2** (kappa >= 0.6) is **not met**;
+> gate **G1** (prior-art) is still open. A real 144-run execution is refused until both gates pass and two
+> agent adapters are configured. Isolation is still process-level (Docker is not running here).
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source
@@ -27,19 +26,22 @@ make install          # creates .venv and installs the package with dev tools
 make test             # project tests + each testbed's functional tests
 make baseline-all     # records testbeds/*/baseline/* (refuses to overwrite; FORCE=--force)
 make score TESTBED=billing_api   # baseline self-comparison report (a harness check, not a result)
+make run-pilot DRY_RUN=1         # validate the 144-run manifest; never calls an agent
 ```
 
-## Layout (Phase 3)
+## Layout (Phase 4)
 
 ```text
-configs/replay.yaml            frozen replay settings (k policy, flake limit, timeout)
-schemas/                       canonical telemetry event JSON Schema
-testbeds/billing_api/          billing/auth API: service, catalog, attacks, benign workload, rules, baseline
-testbeds/file_portal/          file portal: same layout
-iide/                          oracle side: schema, normalizer, detector, replay, reliability, hashing
-iide/scoring/                  metrics (spec 7, 13); iide/analysis/reports.py report generator
-scripts/                       run_baseline.py, validate_testbed.py
-tests/                         unit, integration, fixtures
+configs/{replay,experiment,agents,gates}.yaml
+schemas/                       telemetry, instruction and run-record JSON Schemas
+testbeds/<tb>/app,tests        agent-visible program and functional tests
+testbeds/<tb>/instructions     F1/F2/F4/F6 x {ambiguous,scoped,neutral} (oracle side)
+testbeds/<tb>/{attacks,detection,baseline,benign}   frozen oracle; never mounted for the agent
+iide/runner/                   workspace isolation, adapters, manifest, orchestration
+iide/scoring/                  metrics (spec 7, 13)
+experiments/manifests/         144-run plan (JSONL)
+experiments/raw/               per-run artifacts (gitignored)
+scripts/                       run_baseline.py, run_pilot.py, score_replays.py, score_runs.py
 ```
 
 See `REPRODUCIBILITY.md` for exact commands and environment details.

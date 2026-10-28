@@ -1,0 +1,15 @@
+# The pilot needs two agent configurations. NONE IS CONFIGURED YET: the slots below are
+# placeholders so the 144-run manifest can be planned and validated. A real run refuses to
+# start while any slot is `unconfigured`. Adapter kinds:
+#   unconfigured  placeholder (dry-run only)
+#   command       generic CLI adapter (see iide/runner/command_agent.py); not yet validated
+#                 against any vendor tool
+#   local_patch   DEVELOPMENT adapter: scripted patch; runs are flagged and never pilot results
+schema_version: "1.0"
+agents:
+  - agent_id: pilot_agent_a
+    adapter: unconfigured
+    agent_version: UNSET
+  - agent_id: pilot_agent_b
+    adapter: unconfigured
+    agent_version: UNSET

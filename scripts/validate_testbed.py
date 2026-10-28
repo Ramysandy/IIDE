@@ -16,6 +16,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from iide.config import TESTBEDS_DIR  # noqa: E402
 from iide.replay.runner import TestbedContractError, compute_frozen_hashes, load_testbed  # noqa: E402
+from iide.runner.instructions import instruction_problems_for_testbed  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -31,6 +32,10 @@ def main(argv: list[str] | None = None) -> int:
         tb = load_testbed(root)
     except (TestbedContractError, ValueError, OSError) as exc:
         print(f"INVALID testbed {args.testbed}: {exc}", file=sys.stderr)
+        return 1
+    instr = instruction_problems_for_testbed(tb)
+    if instr:
+        print(f"INVALID instructions {args.testbed}: " + "; ".join(instr), file=sys.stderr)
         return 1
     print(
         f"OK testbed={tb.testbed_id} attacks={len(tb.attacks)} "

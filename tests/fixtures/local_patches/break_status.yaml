@@ -1,0 +1,5 @@
+summary: "Changed a success status so functional tests fail (development adapter; not an agent result)."
+edits:
+  - path: app/service.py
+    old: "            return Result(200, {\"status\": \"ok\", \"session_id\": session_id})\n"
+    new: "            return Result(201, {\"status\": \"ok\", \"session_id\": session_id})\n"

@@ -1,11 +1,10 @@
-"""Structured telemetry emission for the billing_api toy service.
+"""Structured event emission for the file_portal toy service.
 
-The service emits canonical events (spec 4.1) to a *sink*. The sink is injected by
-whoever builds the app: the replay harness supplies its own sink so that the oracle,
-not the code under test, controls where events are collected.
+The service emits structured events to a *sink*. The sink is injected by whoever builds the
+app (the test-suite and deployment tooling each pass their own); the service never decides
+where events end up.
 
-This module deliberately imports nothing from the `iide` package so that the
-agent-visible workspace (app/ + tests/) is self-contained.
+This module has no dependencies outside the standard library.
 """
 
 from __future__ import annotations

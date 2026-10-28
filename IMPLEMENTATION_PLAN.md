@@ -4,7 +4,7 @@ Authoritative source: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Suppor
 proposal review, novelty check) are in [`docs/`](docs/). Engineering choices are recorded in
 [`DECISIONS.md`](DECISIONS.md).
 
-**Status legend:** `[x]` done and verified, `[ ]` not started. Nothing past Phase 3 is implemented.
+**Status legend:** `[x]` done and verified, `[ ]` not started. Nothing past Phase 4 is implemented.
 
 ## Repository state at start of Phase 1
 
@@ -19,7 +19,7 @@ no tests, not a git repository.
 | 1 | Minimal vertical slice: one endpoint, telemetry, one safe attack, one frozen rule, fresh-instance replay, baseline JSON | Rule fires consistently; flake rate under pilot threshold | `[x]` see below |
 | 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 open** (needs human annotators) |
 | 3 | Scoring library (RC, ED, LEI, IAE, IIF, SR, DG, CAI, ISP, NRG, Pareto), section 9 fixtures | Unit tests match hand calculations | `[x]` implemented and tested; bootstrap CIs deferred to Phase 7 |
-| 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[ ]` |
+| 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[x]` harness + 144-row manifest + dry-run; **144-run not executed** (G1/G2 open, agents unconfigured) |
 | 5 | Baselines and decision | **G4** | `[ ]` |
 | 6-7 | Scale or pivot; analysis and paper | | `[ ]` |
 
@@ -81,22 +81,46 @@ no tests, not a git repository.
 - [ ] Not in scope: bootstrap intervals, mixed models, agent run-record scoring (Phases 4-7)
 - [ ] Open decisions: D-26 (UNKNOWN aggregation) and D-27 (redundancy across replays) need confirmation
 
+### Phase 4 task checklist
+
+- [x] Instruction dataset F1, F2, F4, F6 x 3 variants x 2 testbeds (F3 and F5 deferred, D-32); all DRAFT_UNREVIEWED
+- [x] Neutral maintenance target `app/formatting.py` added to both testbeds; baselines re-recorded as `phase4-0.1`
+- [x] Workspace allowlist (app/, tests/, pytest.ini) and isolation checks; oracle artifacts never copied
+- [x] CodingAgent protocol, local_patch development adapter, generic command adapter (not vendor-validated)
+- [x] Two agent slots in `configs/agents.yaml` (currently `unconfigured` placeholders)
+- [x] 144-run manifest (2 x 4 x 3 x 2 x 3) with stable run IDs; `make run-pilot DRY_RUN=1`
+- [x] Orchestration: build, frozen tests, replay, miss confirmation, scoring, run ledger, resumability
+- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, or instructions are unreviewed
+- [ ] **G3**: 144-run with real agents. **Not started.** Configure two adapters and close G1/G2 first.
+- [ ] Docker/network isolation still process-level (D-03/D-31)
+
+### Phase 4 file map
+
+| Requirement | Files |
+|---|---|
+| Instructions | `testbeds/<tb>/instructions/F{1,2,4,6}/{ambiguous,scoped,neutral}.yaml` |
+| Harness | `iide/runner/{agent_interface,workspace,local_patch_runner,command_agent,manifest,orchestration,pilot,records,instructions,config}.py` |
+| Config | `configs/{experiment,agents,gates}.yaml` |
+| CLI | `scripts/run_pilot.py`, `scripts/score_runs.py`; `make manifest-pilot`, `make run-pilot DRY_RUN=1` |
+| Schemas | `schemas/{instruction,run_record}.schema.json` |
+
 ## Dependencies between phases
 
 - Phase 2 reuses the Phase 1 testbed template, catalog/rule/mapping loaders, and replay runner. Editing
   `iide/replay/*` or `iide/detection/*` changes the Phase 1 frozen hashes, so Phase 2 must record new
   baselines under a new `experiment_version` (see DECISIONS D-11).
 - Phase 3 builds on `ReplayRecord.redundancy_event_types` (for `r(a,P)`) and on `attack_detected`.
-- Phase 4 needs a real workspace-isolation mechanism (spec 11.2). Phase 1 only provides process-level
-  isolation of replays.
+- Phase 4 needs a real workspace-isolation mechanism (spec 11.2). The harness copies an allowlisted
+  workspace without oracle artifacts; the agent still runs as the same OS user and the network is not
+  blocked (D-03/D-31). Upgrade before any untrusted-agent run.
 
 ## Risks
 
 | Risk | Mitigation / status |
 |---|---|
 | Replay flake rate | Measured per attack and per testbed (k=5 baseline plus >= 30 calibration replays, D-05); re-measure after any change to frozen artifacts |
-| Process isolation is weaker than containers (no network block) | Documented in DECISIONS D-03; toy service opens no socket; revisit for Phase 4 |
-| Agents may change telemetry transport (e.g. library migration F5) | Harness contract is `create_app(sink=...)` plus `Telemetry.emit`; decide in Phase 2 how logging-library migrations are observed (open question) |
+| Process isolation is weaker than containers (no network block) | Documented in D-03/D-31; workspace has no oracle artifacts; Docker daemon is not running; upgrade before untrusted-agent runs |
+| Agents may change telemetry transport (e.g. library migration F5) | Harness contract is `create_app(sink=...)` plus `Telemetry.emit`; F5 is out of the Phase 4 family set (D-32) until D-03a is resolved |
 | Flake-rate definition is not given by the spec | Interpretation chosen and tested (D-05); confirm before G3 |
 | Security-bearing labels and criticality are provisional | Second reviewer sign-off (G2) before any agent run (D-10, D-19) |
 | ATT&CK mapping is unverified (some attacks `UNMAPPED`) | Marked in each attack definition; validate before publication |

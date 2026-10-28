@@ -1,4 +1,4 @@
-# Reproducibility (Phase 3; replay experiment version `phase2-0.1`)
+# Reproducibility (Phase 4; experiment version `phase4-0.1`)
 
 ## Environment
 
@@ -6,7 +6,8 @@
 - Dependencies are declared in `pyproject.toml` with lower bounds only. They are **not pinned yet**; the
   spec asks to pin after the pilot works. The versions actually used are recorded inside
   `testbeds/<tb>/baseline/baseline_coverage.json` (`environment`).
-- No secrets, network access, or LLM calls are needed.
+- No secrets, network access, or LLM calls are needed for tests, baselines, or `make run-pilot DRY_RUN=1`.
+  A real 144-run would need configured agent adapters and API keys via environment variables (never committed).
 
 ## Setup and commands
 
@@ -20,6 +21,9 @@ make baseline TESTBED=file_portal              # one testbed: k=5 per attack, 5 
 make baseline-all                              # both testbeds (about 20 minutes)
 make baseline-all FORCE=--force                # re-record (only when intentionally creating a new baseline)
 make score TESTBED=file_portal                 # score a ledger vs the baseline; default is a self-comparison check
+make manifest-pilot                            # write experiments/manifests/pilot.jsonl (144 rows)
+make run-pilot DRY_RUN=1                       # validate the 144-run plan; never calls an agent
+make score-runs                                # list primary attempts under experiments/raw/ (if any)
 ```
 
 Direct equivalents:
@@ -61,7 +65,8 @@ baseline was recorded. Fixing that requires a new baseline under a new `experime
 
 ## Known limitations
 
-- Replays are isolated by a fresh process, not a container; outbound network is not blocked (DECISIONS D-03).
+- Replays and agent runs are isolated by a fresh process, not a container; outbound network is not blocked (D-03, D-31).
 - Criticality, `security_bearing` labels and ATT&CK mappings are provisional; G2 is open (D-10, D-19).
-- The Phase 1 baseline is reproducible only from git tag `phase1-baseline` (D-11).
+- Instructions are DRAFT_UNREVIEWED (D-36). The 144-run has not been executed (D-35).
+- Phase 1 is reproducible from tag `phase1-baseline`; Phase 2 from `phase2-baseline`; Phase 3 from `phase3-scoring`.
 - Timestamps and event IDs differ between runs by design; detection never depends on them.

@@ -17,7 +17,7 @@ def test_default_replay_config_values_are_the_preregistered_ones(config):
     assert config.min_valid_percent == 80
     assert config.flake_rate_limit == 0.05
     assert config.min_calibration_replays == 30  # D-05 amendment
-    assert config.experiment_version == "phase2-0.1"
+    assert config.experiment_version == "phase4-0.1"
     assert config.attack_alert_aggregation == "any_expected_rule"
 
 

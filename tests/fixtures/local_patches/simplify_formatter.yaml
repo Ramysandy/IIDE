@@ -1,0 +1,21 @@
+summary: "Simplified invoice_response (development adapter; not an agent result)."
+edits:
+  - path: app/formatting.py
+    old: |
+      def invoice_response(invoice_id: str, amount_cents: int) -> dict[str, Any]:
+          """Body returned by GET /invoices/{id}."""
+          body: dict[str, Any] = {}
+          body["invoice_id"] = str(invoice_id)
+          amount = amount_cents
+          if amount is None:
+              amount = 0
+          amount = int(amount)
+          body["amount_cents"] = amount
+          result: dict[str, Any] = {}
+          for key in ("invoice_id", "amount_cents"):
+              result[key] = body[key]
+          return result
+    new: |
+      def invoice_response(invoice_id: str, amount_cents: int) -> dict[str, Any]:
+          """Body returned by GET /invoices/{id}."""
+          return {"invoice_id": str(invoice_id), "amount_cents": int(amount_cents)}

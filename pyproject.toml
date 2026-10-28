@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "iide"
 version = "0.1.0"
-description = "Instruction-Induced Detection Erosion (IIDE): reproducible research harness (Phase 1 vertical slice)"
+description = "Instruction-Induced Detection Erosion (IIDE): reproducible research harness"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

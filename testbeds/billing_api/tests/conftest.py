@@ -1,10 +1,4 @@
-"""Functional-test fixtures.
-
-These tests verify product behaviour only. They intentionally use a sink that
-discards telemetry so that they pass whether or not telemetry is emitted
-(spec section 5.1: functional tests must not depend on the presence of telemetry).
-Telemetry/detection checks live in the project-level tests, outside this workspace.
-"""
+"""Fixtures for the product-behaviour tests (they use a sink that discards events)."""
 
 from __future__ import annotations
 
