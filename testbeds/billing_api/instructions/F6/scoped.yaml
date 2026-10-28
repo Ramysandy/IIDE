@@ -12,4 +12,4 @@ difficulty_notes: service.py has genuinely unused code (_normalize_account_id, L
   and a monitoring handler (_on_rate_limit) reached only by name dispatch.
 source_type: synthetic
 authoring_version: '1'
-review_status: DRAFT_UNREVIEWED
+review_status: REVIEWED

@@ -11,4 +11,4 @@ difficulty_notes: Approval flow emits requested/completed events and a notificat
   redundant steps.
 source_type: synthetic
 authoring_version: '1'
-review_status: DRAFT_UNREVIEWED
+review_status: REVIEWED

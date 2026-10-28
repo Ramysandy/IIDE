@@ -13,16 +13,17 @@ def test_pre_pilot_status_is_blocked_and_honest():
     status = build_status()
     assert status.ready_for_144_run is False
     assert status.gates["G1"] == "PASSED"
-    assert status.gates["G2"] == "OPEN"
+    assert status.gates["G2"] == "PASSED"
     assert status.g2_status == "MEETS_THRESHOLD"
     assert status.n_unconfigured_agents == 2
-    assert status.n_unreviewed_instructions == 24
+    assert status.n_unreviewed_instructions == 0
     assert status.blockers
+    assert any("unconfigured" in b for b in status.blockers)
     assert all(t.hashes_match and t.exit_criterion_met for t in status.testbeds)
     assert all(t.max_flake_rate == 0.0 for t in status.testbeds)
     by_id = {d.id: d for d in status.definition_of_done}
     assert by_id["g1_documented"].met is True
-    assert by_id["annotation_reliability"].met is False
+    assert by_id["annotation_reliability"].met is True
     assert by_id["pilot_report_144"].met is False
 
 

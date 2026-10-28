@@ -57,7 +57,7 @@ def test_review_packs_are_blinded_and_complete():
     assert (REVIEWS / "instructions" / "annotator_a.yaml").is_file() is False
     for rec in load_instructions(TESTBEDS_DIR / "billing_api").values():
         if rec.family in exp.families:
-            assert rec.review_status == "DRAFT_UNREVIEWED"
+            assert rec.review_status == "REVIEWED"
 
 
 def test_export_review_packs_refuses_to_overwrite_completed_b():

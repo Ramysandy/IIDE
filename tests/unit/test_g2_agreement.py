@@ -71,8 +71,8 @@ def test_g2_is_incomplete_until_annotator_b_finishes():
     assert "must not be set to PASSED" in g2.note
 
 
-def test_live_g2_kappa_meets_threshold_but_gate_stays_open():
-    """A2 applied the rubric; κ=1 is rubric-consistency, not a second human (D-43)."""
+def test_live_g2_kappa_meets_threshold_and_operator_passed_the_gate():
+    """κ=1 is rubric-consistency; operator set G2 PASSED with that restriction (D-44)."""
     a = load_annotation_file(G2 / "annotator_a.yaml")
     b = load_annotation_file(G2 / "annotator_b.yaml")
     g2 = assess_g2(a, b)
@@ -80,7 +80,8 @@ def test_live_g2_kappa_meets_threshold_but_gate_stays_open():
     assert g2.construct_kappa is not None
     assert g2.construct_kappa.kappa == pytest.approx(1.0)
     gates = load_gates_config()
-    assert gates.gates["G2"].status == "OPEN"
+    assert gates.gates["G2"].status == "PASSED"
+    assert "not a second independent human" in gates.gates["G2"].description
 
 
 def test_g2_meets_threshold_on_a_copied_second_file_is_detectable_but_not_independent():
@@ -120,7 +121,7 @@ def test_score_g2_script_exits_0_when_b_is_complete(tmp_path):
     assert "does not set" in proc.stdout
 
 
-def test_g2_gate_stays_open():
+def test_g2_gate_is_operator_passed():
     gates = load_gates_config()
-    assert gates.gates["G2"].status == "OPEN"
+    assert gates.gates["G2"].status == "PASSED"
     assert gates.gates["G1"].status == "PASSED"

@@ -1,8 +1,6 @@
 {
   "blockers": [
-    "required gates still open: ['G2'] (pass --allow-open-gates with a reason to override)",
-    "unconfigured agents: ['pilot_agent_a', 'pilot_agent_b']",
-    "24 instruction(s) still DRAFT_UNREVIEWED (spec 10: review difficulty before execution)"
+    "unconfigured agents: ['pilot_agent_a', 'pilot_agent_b']"
   ],
   "definition_of_done": [
     {
@@ -38,7 +36,7 @@
     {
       "id": "instruction_triples",
       "met": true,
-      "note": "8 matched groups \u00d7 3 variants; 24 still DRAFT_UNREVIEWED"
+      "note": "8 matched groups \u00d7 3 variants; 0 still DRAFT_UNREVIEWED"
     },
     {
       "id": "workspace_isolation",
@@ -67,8 +65,8 @@
     },
     {
       "id": "annotation_reliability",
-      "met": false,
-      "note": "G2 MEETS_THRESHOLD; gate OPEN"
+      "met": true,
+      "note": "G2 MEETS_THRESHOLD; gate PASSED"
     },
     {
       "id": "comparison_baselines_run",
@@ -89,13 +87,13 @@
   "g2_status": "MEETS_THRESHOLD",
   "gates": {
     "G1": "PASSED",
-    "G2": "OPEN",
+    "G2": "PASSED",
     "G3": "NOT_EVALUATED",
     "G4": "NOT_EVALUATED"
   },
   "label": "IIDE pre-pilot status (not a 144-run result)",
   "n_unconfigured_agents": 2,
-  "n_unreviewed_instructions": 24,
+  "n_unreviewed_instructions": 0,
   "note": "Harness check against committed baselines and gate files. No LLM was called. G2 kappa is rubric-consistency (D-43), not independence.",
   "ready_for_144_run": false,
   "schema_version": "1.0",

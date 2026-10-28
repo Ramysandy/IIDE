@@ -10,13 +10,13 @@ gates:
       E1+E2+E3 combination; no occupying study found). Claim restrictions in that
       memo still apply. This is not a proof that no occupying paper exists.
   G2:
-    status: OPEN
+    status: PASSED
     description: >-
-      Construct pack in docs/g2/ (28 vignettes, rubric, A1 and A2 labels).
-      make g2-agreement reports construct κ = 1.000 (MEETS_THRESHOLD numerically).
-      A2 applied the rubric without opening A1 but is the project coding assistant,
-      not a second independent human, so this gate stays OPEN (D-43). S_sec and
-      criticality double-coding (D-10, D-19) remain separate and are not this gate.
+      Operator sign-off 2026-10-28 on docs/g2/ (28 vignettes). Construct κ = 1.000
+      (MEETS_THRESHOLD). A2 applied the rubric without opening A1. A2 is the project
+      coding assistant, not a second independent human (D-43, D-44). Do not report
+      this κ as independent human reliability in a paper. S_sec and criticality
+      double-coding (D-10, D-19) remain separate.
   G3:
     status: NOT_EVALUATED
     description: Pilot outcome gate (confirmed ambiguous erosions, contrast, flake < 5%).

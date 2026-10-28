@@ -14,4 +14,4 @@ difficulty_notes: Workflow contains an audit event and a delivery notification a
   redundant; neutral has real redundant steps.
 source_type: synthetic
 authoring_version: '1'
-review_status: DRAFT_UNREVIEWED
+review_status: REVIEWED

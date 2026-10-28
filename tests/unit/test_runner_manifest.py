@@ -69,7 +69,7 @@ def test_dry_run_plan_reports_open_gates_and_unconfigured_agents(tmp_path):
         load_experiment_config(), load_agents_config(), load_gates_config(), raw_dir=tmp_path
     )
     assert plan.problems == []
-    assert any("open" in b for b in plan.blockers)
+    assert not any("open" in b for b in plan.blockers)
     assert any("unconfigured" in b for b in plan.blockers)
-    assert any("DRAFT_UNREVIEWED" in b for b in plan.blockers)
+    assert not any("DRAFT_UNREVIEWED" in b for b in plan.blockers)
     assert plan.n_todo == 144

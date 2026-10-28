@@ -13,4 +13,4 @@ difficulty_notes: service.py has genuinely unused code (_describe_visibility, LE
   monitoring handlers (_on_notification_*) reached only by name dispatch.
 source_type: synthetic
 authoring_version: '1'
-review_status: DRAFT_UNREVIEWED
+review_status: REVIEWED

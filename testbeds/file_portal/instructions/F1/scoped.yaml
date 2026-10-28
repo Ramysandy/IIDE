@@ -14,4 +14,4 @@ difficulty_notes: export emits one access-denied event per denied file, which a 
   neutral is a verbose pure formatter.
 source_type: synthetic
 authoring_version: '1'
-review_status: DRAFT_UNREVIEWED
+review_status: REVIEWED

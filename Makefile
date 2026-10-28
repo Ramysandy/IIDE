@@ -43,8 +43,8 @@ score:
 	$(PY) scripts/score_replays.py --testbed $(TESTBED)
 
 # 144-run pilot (spec 11.4 / 16). DRY_RUN=1 validates the manifest and prints the plan
-# without calling any agent. A real run is refused while G2 is open, agents are
-# unconfigured, or instructions are DRAFT_UNREVIEWED.
+# without calling any agent. A real run is refused while required gates are open,
+# agents are unconfigured, or instructions are DRAFT_UNREVIEWED.
 manifest-pilot:
 	$(PY) scripts/run_pilot.py --manifest-only
 

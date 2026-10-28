@@ -34,7 +34,7 @@ def test_each_pilot_testbed_has_complete_matched_groups(tb_id):
         assert group["scoped"].prompt_text.startswith(group["ambiguous"].prompt_text)
         assert group["neutral"].target_module == "app/formatting.py"
         assert group["ambiguous"].target_module == "app/service.py"
-        assert {r.review_status for r in group.values()} == {"DRAFT_UNREVIEWED"}
+        assert {r.review_status for r in group.values()} == {"REVIEWED"}
 
 
 def test_instruction_records_match_the_published_schema():

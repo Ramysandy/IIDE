@@ -17,7 +17,7 @@ no tests, not a git repository.
 |---|---|---|---|
 | 0 | Prior-art sweep, novelty matrix, go/no-go memo | **G1** | `[x]` memo in `docs/g1_prior_art.md`; **G1 PASSED** (operator sign-off 2026-10-28). Novelty is **not** claimed as established. |
 | 1 | Minimal vertical slice: one endpoint, telemetry, one safe attack, one frozen rule, fresh-instance replay, baseline JSON | Rule fires consistently; flake rate under pilot threshold | `[x]` see below |
-| 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 OPEN** (28-item pack in `docs/g2/`; second annotator not done) |
+| 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 PASSED** (operator, D-44; κ=1.0 is not independent human reliability) |
 | 3 | Scoring library (RC, ED, LEI, IAE, IIF, SR, DG, CAI, ISP, NRG, Pareto), section 9 fixtures | Unit tests match hand calculations | `[x]` implemented and tested; bootstrap CIs deferred to Phase 7 |
 | 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[x]` harness + 144-row manifest + dry-run; **144-run not executed** (G2 open, agents unconfigured) |
 | 5 | Baselines and decision | **G4** | `[x]` construct check on scripted patches; **G4 NOT_EVALUATED** for the 144-run (no 144-run exists) |
@@ -65,7 +65,7 @@ no tests, not a git repository.
 - [x] Catalog `security_basis` rule for `S_sec` (D-10); provisional criticality (D-19)
 - [x] Baseline artifacts per testbed, with 30-replay per-attack calibration (D-05) and `benign_set_hash`
 - [x] Tests: functional (billing 32, portal 25), oracle tests on both testbeds, telemetry-removal mutations (erosion and latent erosion)
-- [x] **G2 pack labelled:** 28-item construct pack in `docs/g2/` (D-41); A2 filled from the rubric (D-43). Construct κ = 1.000. **G2 stays OPEN** because A2 is not a second independent human. `docs/reviews/` A2 sheets are filled; instruction YAML is still DRAFT_UNREVIEWED.
+- [x] **G2 PASSED** (operator, D-44): 28-item pack labelled; construct κ = 1.000. Do not cite as independent human agreement. In-matrix instructions are REVIEWED. `S_sec` / criticality YAML still provisional.
 
 ### Phase 2 file map
 
@@ -90,15 +90,15 @@ no tests, not a git repository.
 
 ### Phase 4 task checklist
 
-- [x] Instruction dataset F1, F2, F4, F6 x 3 variants x 2 testbeds (F3 and F5 deferred, D-32); all DRAFT_UNREVIEWED
+- [x] Instruction dataset F1, F2, F4, F6 x 3 variants x 2 testbeds (F3 and F5 deferred, D-32); in-matrix rows REVIEWED (D-44)
 - [x] Neutral maintenance target `app/formatting.py` added to both testbeds; baselines re-recorded as `phase4-0.1`
 - [x] Workspace allowlist (app/, tests/, pytest.ini) and isolation checks; oracle artifacts never copied
 - [x] CodingAgent protocol, local_patch development adapter, generic command adapter (not vendor-validated)
 - [x] Two agent slots in `configs/agents.yaml` (currently `unconfigured` placeholders)
 - [x] 144-run manifest (2 x 4 x 3 x 2 x 3) with stable run IDs; `make run-pilot DRY_RUN=1`
 - [x] Orchestration: build, frozen tests, replay, miss confirmation, scoring, run ledger, resumability
-- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, or instructions are unreviewed (G1 now PASSED; G2 still OPEN)
-- [ ] **G3**: 144-run with real agents. **Not started.** Configure two adapters and close G1/G2 first.
+- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, or instructions are unreviewed (G1/G2 PASSED; agents still unconfigured)
+- [ ] **G3**: 144-run with real agents. **Not started.** Configure two adapters first.
 - [ ] Docker/network isolation still process-level (D-03/D-31)
 
 ### Phase 4 file map

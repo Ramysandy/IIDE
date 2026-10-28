@@ -4,16 +4,15 @@ A reproducible research harness for measuring whether ordinary maintenance instr
 agent to remove or degrade security telemetry that a frozen detection pipeline relies on, even when
 functional tests still pass.
 
-> **Status: Phase 5 harness plus G1 PASSED.** The prior-art sweep is in
+> **Status: Phase 5 harness; G1 and G2 PASSED (operator).** The prior-art sweep is in
 > [`docs/g1_prior_art.md`](docs/g1_prior_art.md) (recommended **GO** for the E1+E2+E3 combination).
-> That memo is not a novelty claim. Gate **G2** is still **OPEN**: construct κ = 1.000 on
-> [`docs/g2/`](docs/g2/) is rubric-consistency, not a second independent human (D-43).
-> `S_sec`, criticality, and instruction A2 sheets are in [`docs/reviews/`](docs/reviews/);
-> instruction YAML stays `DRAFT_UNREVIEWED`. `make report` writes a pre-pilot status file, not a
-> 144-run result. A G4 construct check on scripted patches is in
-> `experiments/reports/g4_calibration.md` and does not set G4 to PASSED. **No LLM has been called
-> and no experimental result exists.** A real 144-run is refused until G2 passes, instructions are
-> REVIEWED, and two agent adapters are configured. Isolation is still process-level.
+> That memo is not a novelty claim. Gate **G2** is **PASSED** with claim restriction D-44:
+> construct κ = 1.000 on [`docs/g2/`](docs/g2/) is not independent human reliability.
+> In-matrix instructions are `REVIEWED`. `S_sec` and criticality catalog/attack YAML stay
+> provisional. `make report` writes a pre-pilot status file, not a 144-run result. A G4
+> construct check on scripted patches is in `experiments/reports/g4_calibration.md` and does
+> not set G4 to PASSED. **No LLM has been called and no experimental result exists.** A real
+> 144-run is refused until two agent adapters are configured. Isolation is still process-level.
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source

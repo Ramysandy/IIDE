@@ -87,10 +87,10 @@ baseline was recorded. Fixing that requires a new baseline under a new `experime
 
 - Replays and agent runs are isolated by a fresh process, not a container; outbound network is not blocked (D-03, D-31).
 - Criticality, `security_bearing` labels and ATT&CK mappings are provisional; G2 is open (D-10, D-19).
-- Instructions are DRAFT_UNREVIEWED (D-36). The 144-run has not been executed (D-35).
+- In-matrix instructions are REVIEWED (D-44). The 144-run has not been executed (D-35).
 - G4 is a construct check on scripted patches (D-38, D-39), not a 144-run result.
 - G1 sweep is in `docs/g1_prior_art.md` (D-40). Recommended GO; operator set G1 PASSED 2026-10-28.
-- G2 construct pack is `docs/g2/` (D-41, D-43). A2 is filled; construct κ = 1.000; G2 stays OPEN because A2 is not a second independent human. `S_sec`, criticality, and instruction A2 sheets are in `docs/reviews/`; instruction YAML is still DRAFT_UNREVIEWED.
+- G2 construct pack is `docs/g2/` (D-41–D-44). A2 is filled; construct κ = 1.000; operator set G2 PASSED with the restriction that this is not independent human reliability. `S_sec` and criticality catalog/attack YAML remain provisional.
 - `make report` is a pre-pilot harness check (D-42), not a 144-run result.
 - Phase 1 is reproducible from tag `phase1-baseline`; Phase 2 from `phase2-baseline`; Phase 3 from `phase3-scoring`; Phase 4 from `phase4-harness`; Phase 5 from `phase5-baselines`.
 - Timestamps and event IDs differ between runs by design; detection never depends on them.
