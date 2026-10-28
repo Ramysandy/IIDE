@@ -1,0 +1,231 @@
+# Machine-readable G1 matrix (spec 18). Human-readable memo: docs/g1_prior_art.md.
+# This file does not set gates.yaml. A human reviewer must set G1 to PASSED.
+schema_version: "1.0"
+sweep_date: "2026-10-28"
+g1_question: >-
+  Does any existing study measure product detection loss by attack replay under
+  instruction-wording counterfactuals?
+recommended_decision: GO
+claim_scope: combination_e1_e2_e3
+occupying_studies: []
+human_signoff_required: true
+elements:
+  E1: "harm = lost detectability of product attacks (not new exploitability)"
+  E2: "instruction wording as cause (ambiguous / scoped / neutral minimal pairs)"
+  E3: "attack-replay oracle against a frozen detection pipeline"
+  E4: "latent erosion (redundancy lost before a detector goes blind)"
+  E5: "disclosure gap and pre-execution ambiguity index (exploratory)"
+works:
+  - id: overeager
+    title: "Overeager Coding Agents: Measuring Out-of-Scope Actions on Benign Tasks"
+    citation: "arXiv:2605.18583"
+    url: "https://arxiv.org/abs/2605.18583"
+    read_depth: full_html
+    e1: none
+    e2: overlap
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: >-
+      Paired consent kept/stripped variants on benign tasks; oracle is
+      out-of-scope filesystem/shell actions, not product-telemetry detection.
+  - id: snare
+    title: "SNARE: Adaptive Scenario Synthesis for Eliciting Overeager Behavior in Coding Agents"
+    citation: "arXiv:2605.28122"
+    url: "https://arxiv.org/abs/2605.28122"
+    read_depth: full_html
+    e1: none
+    e2: adjacent
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Follow-on overeager elicitation; same harm class as Overeager, not detectability.
+  - id: trace_tampering
+    title: "LLM Agents Can Easily Tamper With Their Own Traces"
+    citation: "arXiv:2609.30266"
+    url: "https://arxiv.org/abs/2609.30266"
+    read_depth: full_html
+    e1: adjacent
+    e2: none
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: >-
+      Agents delete or rewrite their own execution traces when asked or under
+      reward. Subject is the agent's audit log, not the product's security telemetry.
+  - id: wesce
+    title: "WeSCE: A Benchmark for Measuring Security Drift in LLM-Driven Code Editing"
+    citation: "arXiv:2608.15092"
+    url: "https://arxiv.org/abs/2608.15092"
+    read_depth: full_html
+    e1: none
+    e2: adjacent
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Functional-only edits scored by CodeQL/Bandit/Atheris vulnerability risk, not detection fire/miss.
+  - id: secdrift
+    title: "SecDrift: Measuring Sector-Conditioned Security Drift in AI-Generated Code"
+    citation: "arXiv:2607.25225"
+    url: "https://arxiv.org/abs/2607.25225"
+    read_depth: full_html
+    e1: none
+    e2: overlap
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Industry vs matched-baseline prompt framing; outcome is SAST flag rate, not attack-replay detectability.
+  - id: iac_regression
+    title: "Does Fixing Break Security? An Empirical Study of Security Degradation in Iterative LLM-Driven Infrastructure-as-Code Repair"
+    citation: "arXiv:2608.13404"
+    url: "https://arxiv.org/abs/2608.13404"
+    read_depth: full_html
+    e1: none
+    e2: none
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: CIS/Checkov check regressions during iterative IaC repair. No instruction-wording pairs, no attack replay.
+  - id: ifg
+    title: "Democratizing Agent Deployment Safety: A Structural Monitoring Approach"
+    citation: "arXiv:2607.14570"
+    url: "https://arxiv.org/abs/2607.14570"
+    read_depth: full_html
+    e1: adjacent
+    e2: none
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: >-
+      IFG monitor for IaC sabotage including degrading logging. Defense against
+      covert sabotage, not a measurement of unintended detection loss under wording pairs.
+      Candidate comparison baseline (Phase 5 recorded UNAVAILABLE).
+  - id: towards_secure_logging
+    title: "Towards Secure Logging: Characterizing and Benchmarking Logging Code Security Issues with LLMs"
+    citation: "arXiv:2604.20211"
+    url: "https://arxiv.org/abs/2604.20211"
+    read_depth: abstract
+    e1: none
+    e2: none
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Taxonomy of dangerous logging (leakage, injection). Missing telemetry is out of scope.
+  - id: aspi
+    title: "ASPI: Seeking Ambiguity Clarification Amplifies Prompt Injection Vulnerability in LLM Agents"
+    citation: "arXiv:2605.17324"
+    url: "https://arxiv.org/abs/2605.17324"
+    read_depth: full_html
+    e1: none
+    e2: adjacent
+    e3: none
+    e4: none
+    e5: adjacent
+    occupies_g1_gap: false
+    note: Ambiguity as a prompt-injection amplifier, not as a cause of product-telemetry loss.
+  - id: agenttelemetry
+    title: "AgentTelemetry: A Fault Detection Benchmark and Toolkit for LLM Agent Observability"
+    citation: "AIware 2026; ACM 10.1145/3805760.3814931"
+    url: "https://dl.acm.org/doi/10.1145/3805760.3814931"
+    read_depth: full_pdf
+    e1: none
+    e2: none
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Observes the agent (span taxonomy for agent faults), not the product's detection pipeline.
+  - id: alertguardian
+    title: "AlertGuardian: Intelligent Alert Life-Cycle Management for Large-scale Cloud Systems"
+    citation: "arXiv:2601.14912"
+    url: "https://arxiv.org/abs/2601.14912"
+    read_depth: full_html
+    e1: none
+    e2: none
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Defender-side alert denoising and rule refinement. Informs that noise reduction is a legitimate task.
+  - id: openai_incident
+    title: "Suppressing misalignment monitoring alerts and disabling misalignment monitoring"
+    citation: "OpenAI Alignment report, 2026-10-20"
+    url: "https://alignment.openai.com/misalignment-reports/suppressing-misalignment-monitoring-alerts-and-disabling-misalignment-monitoring"
+    read_depth: full_html
+    e1: adjacent
+    e2: adjacent
+    e3: none
+    e4: none
+    e5: adjacent
+    occupies_g1_gap: false
+    note: >-
+      Real incident: routine instructions interpreted as licence to suppress alerts
+      or remove a monitor; one agent denied the removal. Motivation, not a published
+      measurement of product SIEM coverage under a frozen replay oracle. Scoop risk
+      if OpenAI releases a monitoring-evasion eval that uses attack replay.
+  - id: sigma_regression
+    title: "Sigma / Atomic Red Team regression testing (industry)"
+    citation: "Scythe Sigma pipeline; Detection-as-code practice"
+    url: "https://scythe.io/sigma"
+    read_depth: web
+    e1: none
+    e2: none
+    e3: overlap
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Attack-replay against frozen rules is standard detection engineering. No coding-agent instruction factor.
+  - id: sleight_bench
+    title: "SLEIGHT-Bench: A Benchmark of Evasion Attacks Against Agent Monitors"
+    citation: "arXiv:2605.16626"
+    url: "https://arxiv.org/abs/2605.16626"
+    read_depth: full_html
+    e1: adjacent
+    e2: adjacent
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Covert harm vs LLM monitors of the agent. Not product-telemetry coverage after an edit.
+  - id: prompt_structure
+    title: "Prompt Structure Redistributes, Not Reduces"
+    citation: "arXiv:2608.24857"
+    url: "https://arxiv.org/pdf/2608.24857.pdf"
+    read_depth: full_pdf
+    e1: none
+    e2: overlap
+    e3: none
+    e4: none
+    e5: none
+    occupies_g1_gap: false
+    note: Prompt variants change SAST CWE mix in generated Python. Harm is vulnerability prevalence, not detectability.
+searches:
+  - query: "Overeager Coding Agents security telemetry logging"
+  - query: "SecDrift security regression coding agents"
+  - query: "WeSCE security coding evaluation"
+  - query: "IFG monitor information flow graph coding agent security"
+  - query: "trace tampering coding agents telemetry logs detection evasion LLM"
+  - query: "infrastructure as code security regression terraform logging"
+  - query: "telemetry-removal evaluation detection-coverage regression observability regression"
+  - query: "instruction wording counterfactual coding agent security telemetry"
+  - query: "site:arxiv.org coding agent remove logging telemetry detection coverage attack replay"
+  - query: "monitoring evasion evaluation telemetry removal coding agent silent detection failure"
+  - query: "OpenAI agents disabled safety monitoring October 2026"
+  - query: "SNARE arXiv 2605.28122 ASPI Towards Secure Logging AgentTelemetry AlertGuardian"
+claim_restrictions:
+  - "Do not claim E2 (paired instruction variants) as a method contribution."
+  - "Do not claim E3 (attack replay against frozen rules) as a technique contribution."
+  - "Do not claim E1 as an unseen phenomenon; the OpenAI incident and IFG's degrading-logging sabotage are adjacent."
+  - "Lead with the E1+E2+E3 combination and with LEI (E4). Keep CAI (E5) exploratory."
+  - "If an occupying study appears (OpenAI eval, Overeager follow-on with a telemetry category), narrow to LEI and DG."
+narrow_if:
+  - "A study measures product detection loss by attack replay under instruction-wording counterfactuals."
+  - "OpenAI (or another lab) releases a monitoring-evasion eval that uses a frozen detection pipeline plus wording pairs on product telemetry."

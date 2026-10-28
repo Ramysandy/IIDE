@@ -5,7 +5,11 @@ schema_version: "1.0"
 gates:
   G1:
     status: OPEN
-    description: Prior-art sweep and novelty go/no-go memo (Phase 0). Not done.
+    description: >-
+      Prior-art sweep documented in docs/g1_prior_art.md and docs/g1_matrix.yaml
+      (recommended GO for the E1+E2+E3 combination; no occupying study found on
+      2026-10-28). This file is human-owned; a reviewer must set PASSED after
+      spot-checking the memo. The harness must not auto-pass G1.
   G2:
     status: OPEN
     description: Two annotators on 25-30 labelled examples, kappa >= 0.6. Not done.

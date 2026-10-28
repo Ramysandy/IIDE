@@ -4,15 +4,17 @@ A reproducible research harness for measuring whether ordinary maintenance instr
 agent to remove or degrade security telemetry that a frozen detection pipeline relies on, even when
 functional tests still pass.
 
-> **Status: Phase 5 (comparison baselines) on top of the Phase 4 harness.** A G4 construct check on
-> four scripted patches is in `experiments/reports/g4_calibration.md`. That is **not** a 144-run result
-> and does not set gate G4 to PASSED. **No LLM has been called and no experimental result exists.**
-> Gates **G1** and **G2** are still open. A real 144-run execution is refused until both pass and two
-> agent adapters are configured. Isolation is still process-level (Docker is not running here).
+> **Status: Phase 5 harness plus a Phase 0 G1 memo.** The prior-art sweep is in
+> [`docs/g1_prior_art.md`](docs/g1_prior_art.md) (recommended **GO** for the E1+E2+E3 combination).
+> Gate **G1** is still **OPEN** until a human reviewer sets PASSED. That memo is not a novelty claim.
+> A G4 construct check on scripted patches is in `experiments/reports/g4_calibration.md` and does not
+> set G4 to PASSED. **No LLM has been called and no experimental result exists.** Gate **G2** is still
+> open. A real 144-run is refused until G1 and G2 pass and two agent adapters are configured.
+> Isolation is still process-level (Docker is not running here).
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source
-documents: [`docs/`](docs/).
+documents: [`docs/`](docs/) (G1 memo committed; proposal PDFs stay local/gitignored).
 
 ## Safety
 

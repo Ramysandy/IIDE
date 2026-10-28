@@ -86,5 +86,6 @@ baseline was recorded. Fixing that requires a new baseline under a new `experime
 - Criticality, `security_bearing` labels and ATT&CK mappings are provisional; G2 is open (D-10, D-19).
 - Instructions are DRAFT_UNREVIEWED (D-36). The 144-run has not been executed (D-35).
 - G4 is a construct check on scripted patches (D-38, D-39), not a 144-run result.
-- Phase 1 is reproducible from tag `phase1-baseline`; Phase 2 from `phase2-baseline`; Phase 3 from `phase3-scoring`; Phase 4 from `phase4-harness`.
+- G1 sweep is in `docs/g1_prior_art.md` (D-40). Recommended GO; `gates.yaml` G1 stays OPEN until a human signs off.
+- Phase 1 is reproducible from tag `phase1-baseline`; Phase 2 from `phase2-baseline`; Phase 3 from `phase3-scoring`; Phase 4 from `phase4-harness`; Phase 5 from `phase5-baselines`.
 - Timestamps and event IDs differ between runs by design; detection never depends on them.

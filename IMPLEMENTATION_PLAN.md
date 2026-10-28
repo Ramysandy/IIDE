@@ -1,8 +1,8 @@
 # IIDE Implementation Plan
 
 Authoritative source: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Supporting documents (proposal,
-proposal review, novelty check) are in [`docs/`](docs/). Engineering choices are recorded in
-[`DECISIONS.md`](DECISIONS.md).
+proposal review, novelty check) are in [`docs/`](docs/) as gitignored PDFs. The G1 memo is
+[`docs/g1_prior_art.md`](docs/g1_prior_art.md). Engineering choices are in [`DECISIONS.md`](DECISIONS.md).
 
 **Status legend:** `[x]` done and verified, `[ ]` not started. Nothing past Phase 5 is implemented.
 
@@ -15,13 +15,21 @@ no tests, not a git repository.
 
 | Phase | Scope (spec section 18) | Gate / exit | Status |
 |---|---|---|---|
-| 0 | Prior-art sweep, novelty matrix, go/no-go memo | **G1** | `[ ]` Not done. **Novelty is not established.** |
+| 0 | Prior-art sweep, novelty matrix, go/no-go memo | **G1** | `[x]` memo in `docs/g1_prior_art.md` (recommended GO); **G1 OPEN** until a human sets PASSED. Novelty is **not** claimed as established. |
 | 1 | Minimal vertical slice: one endpoint, telemetry, one safe attack, one frozen rule, fresh-instance replay, baseline JSON | Rule fires consistently; flake rate under pilot threshold | `[x]` see below |
 | 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 open** (needs human annotators) |
 | 3 | Scoring library (RC, ED, LEI, IAE, IIF, SR, DG, CAI, ISP, NRG, Pareto), section 9 fixtures | Unit tests match hand calculations | `[x]` implemented and tested; bootstrap CIs deferred to Phase 7 |
 | 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[x]` harness + 144-row manifest + dry-run; **144-run not executed** (G1/G2 open, agents unconfigured) |
 | 5 | Baselines and decision | **G4** | `[x]` construct check on scripted patches; **G4 NOT_EVALUATED** for the 144-run (no 144-run exists) |
 | 6-7 | Scale or pivot; analysis and paper | | `[ ]` |
+
+### Phase 0 task checklist
+
+- [x] Inspect repository, environment, and current files
+- [x] `IMPLEMENTATION_PLAN.md` with milestones and risks
+- [x] Prior-art sweep of named neighbors (Overeager, trace tampering, SecDrift, WeSCE, IaC regression, IFG) plus spec search phrases
+- [x] Novelty matrix and go/no-go memo (`docs/g1_prior_art.md`, `docs/g1_matrix.yaml`)
+- [ ] **G1 PASSED** by a human reviewer after spot-checking the memo. Recommended decision is GO for the combination only (D-40). Novelty is not claimed as established.
 
 ### Phase 1 task checklist
 
@@ -150,5 +158,5 @@ no tests, not a git repository.
 | Flake-rate definition is not given by the spec | Interpretation chosen and tested (D-05); confirm before G3 |
 | Security-bearing labels and criticality are provisional | Second reviewer sign-off (G2) before any agent run (D-10, D-19) |
 | ATT&CK mapping is unverified (some attacks `UNMAPPED`) | Marked in each attack definition; validate before publication |
-| Novelty gap unverified | Phase 0 / gate G1 still open; no novelty claim is made anywhere |
+| Novelty gap unverified | Sweep recorded (D-40); recommended GO; G1 stays OPEN until a human sets PASSED; no novelty claim is made |
 | G4 construct check ≠ G4 on the experiment | Calibration report is `PROVISIONAL`; `gates.yaml` G4 stays `NOT_EVALUATED` until a real 144-run exists (D-39) |
