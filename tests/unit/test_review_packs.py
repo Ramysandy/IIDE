@@ -60,6 +60,25 @@ def test_review_packs_are_blinded_and_complete():
             assert rec.review_status == "REVIEWED"
 
 
+def test_s_sec_labels_agree_and_criticality_disagreements_are_named():
+    a_sec = {r["item_id"]: r["label"] for r in _load("s_sec", "annotator_a.yaml")["items"]}
+    b_sec = {r["item_id"]: r["label"] for r in _load("s_sec", "annotator_b.yaml")["items"]}
+    assert a_sec == b_sec
+    a_c = {
+        r["item_id"]: r["criticality"] for r in _load("criticality", "annotator_a.yaml")["items"]
+    }
+    b_c = {
+        r["item_id"]: r["criticality"] for r in _load("criticality", "annotator_b.yaml")["items"]
+    }
+    disagree = sorted(i for i in a_c if a_c[i] != b_c[i])
+    assert disagree == [
+        "file_portal/approval_self_approval",
+        "file_portal/public_sharing_exposure",
+    ]
+    note = (REVIEWS / "AGREEMENT.md").read_text(encoding="utf-8")
+    assert "22/22" in note and "10/12" in note
+
+
 def test_export_review_packs_refuses_to_overwrite_completed_b():
     proc = subprocess.run(
         [sys.executable, str(REPO_ROOT / "scripts" / "export_review_packs.py")],

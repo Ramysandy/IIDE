@@ -18,4 +18,5 @@ Regenerate worksheets (does not fill B):
 .venv/bin/python scripts/export_review_packs.py
 ```
 
-Do not copy A1 into B. Regenerating worksheets without `--force` will not clobber filled B files.
+Agreement notes: [`AGREEMENT.md`](AGREEMENT.md). Do not copy A1 into B.
+Regenerating worksheets without `--force` will not clobber filled B files.
