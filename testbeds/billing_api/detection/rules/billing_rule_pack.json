@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "format": "iide-json-rules-v1",
+  "description": "Deterministic JSON-rule prototype that is Sigma-compatible in spirit only. It is NOT a Sigma implementation (spec section 3).",
+  "rule_pack_id": "billing_api_rules",
+  "rule_pack_version": "1.0.0",
+  "rules": [
+    {
+      "rule_id": "IIDE-BILLING-001",
+      "title": "Repeated failed logins followed by account lockout",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": ["credential_bruteforce"],
+      "required_event_types": ["auth.login_failed", "auth.lockout"],
+      "detection": {
+        "group_by": "target_id",
+        "all_of": [
+          { "event_type": "auth.login_failed", "min_count": 5 },
+          { "event_type": "auth.lockout", "min_count": 1 }
+        ]
+      }
+    }
+  ]
+}

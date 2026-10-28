@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "mapping_version": "1.0.0",
+  "testbed_id": "billing_api",
+  "attacks": {
+    "credential_bruteforce": {
+      "expected_rule_ids": ["IIDE-BILLING-001"],
+      "required_event_types": ["auth.login_failed", "auth.lockout"]
+    }
+  }
+}

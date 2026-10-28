@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.env
+# Raw agent outputs / diffs may contain proprietary code (spec §17). Phase 4+.
+experiments/raw/
+
+# Unpublished research documents: kept local unless you decide to publish them.
+docs/*.pdf

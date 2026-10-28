@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "iide:telemetry_event:1.0",
+  "title": "IIDE canonical telemetry event",
+  "description": "Spec section 4.1. event_type is the stable semantic identity. attributes must never carry secrets: property names that look credential-like are rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "timestamp",
+    "service",
+    "event_type",
+    "severity",
+    "actor_id",
+    "target_type",
+    "target_id",
+    "source",
+    "correlation_id",
+    "attributes"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "event_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "timestamp": {
+      "description": "UTC ISO-8601 with a literal Z suffix (normalized form).",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?Z$"
+    },
+    "service": { "type": "string", "minLength": 1 },
+    "event_type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$"
+    },
+    "severity": { "enum": ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"] },
+    "actor_id": { "type": "string", "minLength": 1 },
+    "target_type": { "type": "string", "minLength": 1 },
+    "target_id": { "type": "string", "minLength": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "correlation_id": { "type": "string", "minLength": 1 },
+    "attributes": {
+      "type": "object",
+      "propertyNames": {
+        "not": {
+          "pattern": "(?i)(password|passphrase|secret|token|api[_-]?key|credential)"
+        }
+      }
+    }
+  }
+}

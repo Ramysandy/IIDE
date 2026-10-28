@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "experiment_version": "phase1-0.1",
+  "testbed_id": "billing_api",
+  "generated_at": "2026-10-28T00:34:11.636546Z",
+  "git_commit": null,
+  "git_commit_note": "project is not a git repository; no commit to record",
+  "frozen_hashes": {
+    "rule_pack_hash": "7ef19277fc8f96fe121573dd7f936bdfd6674f9f61c9a1da6e4b461eb5dda685",
+    "attack_set_hash": "4fb3b3327678c11012ca5736dcf43a706bce6b1d622ecc5102caee2765450432",
+    "telemetry_contract_hash": "670e915c902cd8e2077f2be853b4158cf44543cd65e6c2e268ff4c059671e2b5",
+    "detector_engine_hash": "7feb809d6377085ed007c53ef679c2716b2cdf042a5c3f7a6ce148d5350a2c7c",
+    "replay_harness_hash": "860bbbe92f462ddba0956a41f86aaa22e868d0a142aeb0ba2dbe978162d0bdd5",
+    "testbed_source_hash": "c3aec39eddd6c700560c0c21205a1f3772414bd884f1ea61d765fa33063fd1fa"
+  },
+  "replay_config": {
+    "schema_version": "1.0",
+    "experiment_version": "phase1-0.1",
+    "min_valid_percent": 80,
+    "flake_rate_limit": 0.05,
+    "replay_timeout_seconds": 60,
+    "attack_alert_aggregation": "any_expected_rule"
+  },
+  "environment": {
+    "python": "3.13.5",
+    "implementation": "CPython",
+    "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+    "packages": {
+      "fastapi": "0.162.0",
+      "starlette": "1.10.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.14.1",
+      "jsonschema": "4.26.0",
+      "PyYAML": "6.0.3",
+      "pytest": "9.2.0"
+    }
+  },
+  "isolation": {
+    "level": "fresh Python subprocess per replay (python -I -B), scrubbed env, own temp dir and sink",
+    "container": false,
+    "network_blocked": false,
+    "service_binds_socket": false,
+    "note": "App is driven in-process via a test client. See DECISIONS.md D-03."
+  },
+  "functional_tests": {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "working_directory": "testbeds/billing_api",
+    "passed": true,
+    "exit_code": 0,
+    "summary_line": "13 passed, 1 warning in 0.56s"
+  },
+  "attacks": [
+    {
+      "attack_id": "credential_bruteforce",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-BILLING-001"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true
+    }
+  ],
+  "baseline_detected_attack_ids": [
+    "credential_bruteforce"
+  ],
+  "phase1_exit_criterion_met": true,
+  "exit_criterion_notes": [
+    "all Phase 1 baseline checks passed"
+  ]
+}

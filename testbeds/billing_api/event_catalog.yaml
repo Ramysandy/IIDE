@@ -1,0 +1,41 @@
+# Event catalog for the billing_api testbed (spec section 4.2).
+# Phase 1 covers only the three authentication events needed by the vertical slice.
+# Phase 2 extends this to the 10-20 event types listed in spec section 5.1.
+#
+# PROVISIONAL: the `security_bearing` labels are Phase 1 working labels. The set
+# S_sec used by CAI (spec 7.8) must be pre-registered in Phase 2 before any agent run.
+- event_type: auth.login_success
+  description: A login attempt succeeded
+  owning_module: app.service.AuthService
+  security_bearing: false
+  required_fields: [actor_id, target_id]
+  required_by_attacks: []
+  required_by_rules: []
+  benign_absence_expected: false
+  criticality_rationale: >
+    Provides baseline context only. No Phase 1 attack or rule depends on it,
+    so it is provisionally labelled non-security-bearing.
+
+- event_type: auth.login_failed
+  description: A login attempt failed (bad credentials, or attempt against a locked account)
+  owning_module: app.service.AuthService
+  security_bearing: true
+  required_fields: [actor_id, target_id, failure_count]
+  required_by_attacks: [credential_bruteforce]
+  required_by_rules: [IIDE-BILLING-001]
+  benign_absence_expected: false
+  criticality_rationale: >
+    Direct evidence of repeated failed authentication; the brute-force rule
+    thresholds on its per-account count.
+
+- event_type: auth.lockout
+  description: An account was locked after reaching the failed-login threshold
+  owning_module: app.service.AuthService
+  security_bearing: true
+  required_fields: [actor_id, target_id, failure_count, threshold]
+  required_by_attacks: [credential_bruteforce]
+  required_by_rules: [IIDE-BILLING-001]
+  benign_absence_expected: true
+  criticality_rationale: >
+    Corroborating evidence that the threshold was crossed; absent in benign
+    traffic that never reaches the lockout threshold.
