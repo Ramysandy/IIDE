@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "mapping_version": "1.0.0",
+  "testbed_id": "file_portal",
+  "attacks": {
+    "unauthorized_access_probing": {
+      "expected_rule_ids": [
+        "IIDE-PORTAL-001"
+      ],
+      "required_event_types": [
+        "file.access_denied"
+      ]
+    },
+    "bulk_file_export": {
+      "expected_rule_ids": [
+        "IIDE-PORTAL-002",
+        "IIDE-PORTAL-003"
+      ],
+      "required_event_types": [
+        "file.bulk_export",
+        "file.read"
+      ]
+    },
+    "public_sharing_exposure": {
+      "expected_rule_ids": [
+        "IIDE-PORTAL-004",
+        "IIDE-PORTAL-005"
+      ],
+      "required_event_types": [
+        "audit.sharing_changed",
+        "webhook.notification_sent"
+      ]
+    },
+    "approval_self_approval": {
+      "expected_rule_ids": [
+        "IIDE-PORTAL-006"
+      ],
+      "required_event_types": [
+        "approval.requested",
+        "approval.completed"
+      ]
+    },
+    "notification_suppression": {
+      "expected_rule_ids": [
+        "IIDE-PORTAL-007"
+      ],
+      "required_event_types": [
+        "webhook.notification_failed"
+      ]
+    },
+    "validation_error_probing": {
+      "expected_rule_ids": [
+        "IIDE-PORTAL-008"
+      ],
+      "required_event_types": [
+        "service.validation_error"
+      ]
+    }
+  }
+}

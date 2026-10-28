@@ -25,8 +25,8 @@ pytestmark = pytest.mark.integration
 
 def test_billing_testbed_is_internally_consistent(testbed):
     assert testbed.testbed_id == "billing_api"
-    assert set(testbed.attacks) == {"credential_bruteforce"}
-    assert testbed.detector.rule_ids == ("IIDE-BILLING-001",)
+    assert len(testbed.attacks) == 6 and len(testbed.detector.rule_ids) == 8
+    assert "credential_bruteforce" in testbed.attacks
 
 
 def test_emitted_telemetry_matches_schema_and_catalog_contract(testbed):
@@ -121,6 +121,7 @@ def test_frozen_hashes_are_stable_and_cover_expected_artifacts(testbed):
     assert set(first) == {
         "rule_pack_hash",
         "attack_set_hash",
+        "benign_set_hash",
         "telemetry_contract_hash",
         "detector_engine_hash",
         "replay_harness_hash",
@@ -144,3 +145,45 @@ def test_editing_app_source_changes_only_the_source_hash(testbed, testbed_copy):
     service.write_text(service.read_text() + "\n# harmless edit\n")
     after = compute_frozen_hashes(load_testbed(testbed_copy))
     assert {k for k in before if before[k] != after[k]} == {"testbed_source_hash"}
+
+
+def test_rule_using_a_field_the_catalog_does_not_define_is_rejected(testbed_copy):
+    pack = testbed_copy / "detection" / "rules" / "billing_rule_pack.json"
+
+    def edit(data):
+        rule = next(r for r in data["rules"] if r["rule_id"] == "IIDE-BILLING-002")
+        rule["detection"]["all_of"][0]["where"] = {"undefined_field": {"eq": "admin"}}
+
+    _rewrite(pack, edit)
+    with pytest.raises(TestbedContractError, match="not schema-defined"):
+        load_testbed(testbed_copy)
+
+
+def test_rule_mapped_to_an_attack_that_does_not_expect_it_is_rejected(testbed_copy):
+    attack = testbed_copy / "attacks" / "role_escalation.yaml"
+    data = yaml.safe_load(attack.read_text())
+    data["expected_rule_ids"] = ["IIDE-BILLING-002"]  # drops -003, which still maps to it
+    data["required_event_types"] = ["auth.role_changed"]
+    attack.write_text(yaml.safe_dump(data))
+    _rewrite(
+        testbed_copy / "detection" / "mapping.json",
+        lambda d: d["attacks"]["role_escalation"].update(
+            expected_rule_ids=["IIDE-BILLING-002"], required_event_types=["auth.role_changed"]
+        ),
+    )
+    with pytest.raises(TestbedContractError, match="does not list it in expected_rule_ids"):
+        load_testbed(testbed_copy)
+
+
+def test_missing_benign_workload_is_rejected(testbed_copy):
+    (testbed_copy / "benign" / "benign_workload.py").unlink()
+    with pytest.raises(TestbedContractError, match="benign workload"):
+        load_testbed(testbed_copy)
+
+
+def test_editing_the_benign_workload_changes_only_the_benign_hash(testbed, testbed_copy):
+    before = compute_frozen_hashes(testbed)
+    path = testbed_copy / "benign" / "benign_workload.py"
+    path.write_text(path.read_text() + "\n# harmless edit\n")
+    after = compute_frozen_hashes(load_testbed(testbed_copy))
+    assert {k for k in before if before[k] != after[k]} == {"benign_set_hash"}

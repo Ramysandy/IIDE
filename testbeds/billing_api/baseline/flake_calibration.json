@@ -1,9 +1,29 @@
 {
   "schema_version": "1.0",
-  "experiment_version": "phase1-0.1",
+  "experiment_version": "phase2-0.1",
   "testbed_id": "billing_api",
   "replays_per_attack": 30,
   "attacks": [
+    {
+      "attack_id": "bulk_invoice_export",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-BILLING-005",
+        "IIDE-BILLING-006"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
     {
       "attack_id": "credential_bruteforce",
       "criticality": 3,
@@ -20,7 +40,85 @@
       "outcome_disagreement_rate": 0.0,
       "flake_rate": 0.0,
       "flake_limit": 0.05,
-      "flake_within_limit": true
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "rate_limit_abuse",
+      "criticality": 1,
+      "expected_rule_ids": [
+        "IIDE-BILLING-008"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "role_escalation",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-BILLING-002",
+        "IIDE-BILLING-003"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "token_replay",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-BILLING-004"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "webhook_tampering",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-BILLING-007"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
     }
   ]
 }

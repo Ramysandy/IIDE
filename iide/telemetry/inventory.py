@@ -5,10 +5,10 @@ from __future__ import annotations
 from collections import Counter
 from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class CatalogEntry(BaseModel):
@@ -18,11 +18,25 @@ class CatalogEntry(BaseModel):
     description: str = Field(min_length=1)
     owning_module: str = Field(min_length=1)
     security_bearing: bool
+    # D-10: why the label holds. rule_dependency: a frozen rule consumes the event.
+    # audit_category: audit evidence of auth failure, permission/sharing change, bulk export,
+    # denied access, rate-limit, webhook or configuration change. none: neither.
+    security_basis: Literal["rule_dependency", "audit_category", "none"]
     required_fields: list[str]
     required_by_attacks: list[str]
     required_by_rules: list[str]
     benign_absence_expected: bool
     criticality_rationale: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _basis_is_consistent(self) -> CatalogEntry:
+        if self.required_by_rules and self.security_basis != "rule_dependency":
+            raise ValueError(
+                f"{self.event_type}: consumed by rules, so basis must be rule_dependency"
+            )
+        if self.security_bearing != (self.security_basis != "none"):
+            raise ValueError(f"{self.event_type}: security_bearing disagrees with security_basis")
+        return self
 
 
 def load_event_catalog(path: Path) -> dict[str, CatalogEntry]:

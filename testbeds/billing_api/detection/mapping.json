@@ -1,11 +1,60 @@
 {
   "schema_version": "1.0",
-  "mapping_version": "1.0.0",
+  "mapping_version": "2.0.0",
   "testbed_id": "billing_api",
   "attacks": {
     "credential_bruteforce": {
-      "expected_rule_ids": ["IIDE-BILLING-001"],
-      "required_event_types": ["auth.login_failed", "auth.lockout"]
+      "expected_rule_ids": [
+        "IIDE-BILLING-001"
+      ],
+      "required_event_types": [
+        "auth.login_failed",
+        "auth.lockout"
+      ]
+    },
+    "role_escalation": {
+      "expected_rule_ids": [
+        "IIDE-BILLING-002",
+        "IIDE-BILLING-003"
+      ],
+      "required_event_types": [
+        "auth.role_changed",
+        "audit.permission_change"
+      ]
+    },
+    "token_replay": {
+      "expected_rule_ids": [
+        "IIDE-BILLING-004"
+      ],
+      "required_event_types": [
+        "auth.session_rejected"
+      ]
+    },
+    "bulk_invoice_export": {
+      "expected_rule_ids": [
+        "IIDE-BILLING-005",
+        "IIDE-BILLING-006"
+      ],
+      "required_event_types": [
+        "billing.bulk_export",
+        "billing.invoice_read"
+      ]
+    },
+    "webhook_tampering": {
+      "expected_rule_ids": [
+        "IIDE-BILLING-007"
+      ],
+      "required_event_types": [
+        "webhook.configuration_changed"
+      ]
+    },
+    "rate_limit_abuse": {
+      "expected_rule_ids": [
+        "IIDE-BILLING-008"
+      ],
+      "required_event_types": [
+        "api.rate_limit_triggered"
+      ]
     }
   }
 }

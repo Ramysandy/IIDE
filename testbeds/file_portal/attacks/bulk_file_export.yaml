@@ -1,0 +1,19 @@
+# Research label only; the technique mapping and ATT&CK version are NOT validated (spec 4.3).
+# criticality is a PROVISIONAL single-annotator value (spec 8.1 requires two blinded annotators).
+schema_version: '1.0'
+id: bulk_file_export
+technique_id: T1213
+technique_mapping_status: UNVERIFIED
+attack_framework_version: null
+criticality: 3
+criticality_status: PROVISIONAL
+description: 'A reader reads eight shared files and exports twelve in one request. Safe emulation: synthetic
+  identifiers only, in-process requests, no real files, credentials or targets.'
+required_event_types:
+- file.bulk_export
+- file.read
+expected_rule_ids:
+- IIDE-PORTAL-002
+- IIDE-PORTAL-003
+replay_count: 5
+emulation: bulk_file_export.py

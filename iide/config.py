@@ -21,6 +21,7 @@ class ReplayConfig(BaseModel):
     experiment_version: str = Field(min_length=1)
     min_valid_percent: int = Field(ge=1, le=100)
     flake_rate_limit: float = Field(gt=0.0, lt=1.0)
+    min_calibration_replays: int = Field(ge=1)
     replay_timeout_seconds: int = Field(ge=1)
     attack_alert_aggregation: Literal["any_expected_rule"]
 

@@ -16,6 +16,8 @@ ATTACK_YAML = BILLING_ROOT / "attacks" / "credential_bruteforce.yaml"
 def test_default_replay_config_values_are_the_preregistered_ones(config):
     assert config.min_valid_percent == 80
     assert config.flake_rate_limit == 0.05
+    assert config.min_calibration_replays == 30  # D-05 amendment
+    assert config.experiment_version == "phase2-0.1"
     assert config.attack_alert_aggregation == "any_expected_rule"
 
 
@@ -62,6 +64,7 @@ def test_attack_definition_matches_spec_section_4_3():
     assert attack.id == "credential_bruteforce"
     assert attack.technique_id == "T1110"
     assert attack.criticality == 3
+    assert attack.criticality_status == "PROVISIONAL"  # not yet double-annotated
     assert attack.required_event_types == ["auth.login_failed", "auth.lockout"]
     assert attack.expected_rule_ids == ["IIDE-BILLING-001"]
     assert attack.replay_count == 5
@@ -77,6 +80,7 @@ def test_attack_definition_matches_spec_section_4_3():
         ("id", "Bad-Id"),
         ("required_event_types", []),
         ("technique_mapping_status", "MAYBE"),
+        ("criticality_status", "FINAL"),
     ],
 )
 def test_invalid_attack_definitions_are_rejected(tmp_path, key, value):

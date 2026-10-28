@@ -1,0 +1,17 @@
+# Research label only; the technique mapping and ATT&CK version are NOT validated (spec 4.3).
+# criticality is a PROVISIONAL single-annotator value (spec 8.1 requires two blinded annotators).
+schema_version: '1.0'
+id: validation_error_probing
+technique_id: UNMAPPED
+technique_mapping_status: UNVERIFIED
+attack_framework_version: null
+criticality: 1
+criticality_status: PROVISIONAL
+description: 'One actor sends six malformed upload requests. Safe emulation: synthetic identifiers only,
+  in-process requests, no real files, credentials or targets.'
+required_event_types:
+- service.validation_error
+expected_rule_ids:
+- IIDE-PORTAL-008
+replay_count: 5
+emulation: validation_error_probing.py

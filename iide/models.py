@@ -32,6 +32,8 @@ class AttackDefinition(_Record):
     technique_mapping_status: Literal["UNVERIFIED", "VERIFIED"]
     attack_framework_version: str | None
     criticality: Literal[1, 2, 3]
+    # Spec 8.1 requires two blinded annotators + adjudication. Until then: PROVISIONAL.
+    criticality_status: Literal["PROVISIONAL", "ADJUDICATED"]
     description: str
     required_event_types: list[str] = Field(min_length=1)
     expected_rule_ids: list[str] = Field(min_length=1)
@@ -93,6 +95,8 @@ class AttackBaseline(_Record):
     flake_rate: float
     flake_limit: float
     flake_within_limit: bool
+    # Rules that fired in >=1 valid replay but are not mapped to this attack (cross-fire).
+    unexpected_fired_rule_ids: list[str] = []
 
 
 class FunctionalTestResult(_Record):
@@ -101,6 +105,16 @@ class FunctionalTestResult(_Record):
     passed: bool
     exit_code: int
     summary_line: str
+
+
+class NegativeControl(_Record):
+    """Benign workload replays: no frozen rule should fire (spec 5.3 #5)."""
+
+    replays: int
+    valid_replays: int
+    raw_event_counts: list[int]
+    fired_rule_ids: list[str]
+    schema_invalid_event_count: int
 
 
 class BaselineCoverage(_Record):
@@ -119,6 +133,8 @@ class BaselineCoverage(_Record):
     isolation: dict[str, Any]
     functional_tests: FunctionalTestResult
     attacks: list[AttackBaseline]
+    calibration_replays_per_attack: int
+    negative_control: NegativeControl
     baseline_detected_attack_ids: list[str]  # A0 (spec 7.1)
-    phase1_exit_criterion_met: bool
+    exit_criterion_met: bool
     exit_criterion_notes: list[str]

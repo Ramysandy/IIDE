@@ -16,8 +16,13 @@ def catalog():
 
 
 def test_catalog_marks_security_bearing_types(catalog):
-    assert set(catalog) == {"auth.login_success", "auth.login_failed", "auth.lockout"}
-    assert security_bearing_event_types(catalog) == {"auth.login_failed", "auth.lockout"}
+    assert len(catalog) == 12
+    assert {"auth.login_success", "service.validation_error"}.isdisjoint(
+        security_bearing_event_types(catalog)
+    )
+    assert {"auth.login_failed", "auth.lockout", "webhook.delivery_failed"} <= (
+        security_bearing_event_types(catalog)
+    )
 
 
 def test_spec_example_event_satisfies_its_contract(catalog, spec_event):

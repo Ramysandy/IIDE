@@ -1,0 +1,202 @@
+{
+  "schema_version": "1.0",
+  "format": "iide-json-rules-v1",
+  "description": "Deterministic JSON-rule prototype that is Sigma-compatible in spirit only. It is NOT a Sigma implementation (spec section 3).",
+  "rule_pack_id": "file_portal_rules",
+  "rule_pack_version": "1.0.0",
+  "rules": [
+    {
+      "rule_id": "IIDE-PORTAL-001",
+      "title": "Repeated access denials by one actor",
+      "rule_version": "1.0.0",
+      "criticality": 2,
+      "mapped_attack_ids": [
+        "unauthorized_access_probing"
+      ],
+      "required_event_types": [
+        "file.access_denied"
+      ],
+      "detection": {
+        "group_by": "actor_id",
+        "all_of": [
+          {
+            "event_type": "file.access_denied",
+            "min_count": 5
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-PORTAL-002",
+      "title": "Large file export",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": [
+        "bulk_file_export"
+      ],
+      "required_event_types": [
+        "file.bulk_export"
+      ],
+      "detection": {
+        "group_by": "actor_id",
+        "all_of": [
+          {
+            "event_type": "file.bulk_export",
+            "min_count": 1,
+            "where": {
+              "file_count": {
+                "gte": 10
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-PORTAL-003",
+      "title": "High file read volume",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": [
+        "bulk_file_export"
+      ],
+      "required_event_types": [
+        "file.read"
+      ],
+      "detection": {
+        "group_by": "actor_id",
+        "all_of": [
+          {
+            "event_type": "file.read",
+            "min_count": 8
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-PORTAL-004",
+      "title": "File made public (audit.sharing_changed)",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": [
+        "public_sharing_exposure"
+      ],
+      "required_event_types": [
+        "audit.sharing_changed"
+      ],
+      "detection": {
+        "group_by": "target_id",
+        "all_of": [
+          {
+            "event_type": "audit.sharing_changed",
+            "min_count": 1,
+            "where": {
+              "new_visibility": {
+                "eq": "public"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-PORTAL-005",
+      "title": "Public-sharing notification sent",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": [
+        "public_sharing_exposure"
+      ],
+      "required_event_types": [
+        "webhook.notification_sent"
+      ],
+      "detection": {
+        "group_by": "actor_id",
+        "all_of": [
+          {
+            "event_type": "webhook.notification_sent",
+            "min_count": 1,
+            "where": {
+              "trigger": {
+                "eq": "sharing_public"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-PORTAL-006",
+      "title": "Approval decided by its own requester",
+      "rule_version": "1.0.0",
+      "criticality": 2,
+      "mapped_attack_ids": [
+        "approval_self_approval"
+      ],
+      "required_event_types": [
+        "approval.requested",
+        "approval.completed"
+      ],
+      "detection": {
+        "group_by": "target_id",
+        "all_of": [
+          {
+            "event_type": "approval.requested",
+            "min_count": 1
+          },
+          {
+            "event_type": "approval.completed",
+            "min_count": 1,
+            "where": {
+              "self_approved": {
+                "eq": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-PORTAL-007",
+      "title": "Repeated notification delivery failures",
+      "rule_version": "1.0.0",
+      "criticality": 2,
+      "mapped_attack_ids": [
+        "notification_suppression"
+      ],
+      "required_event_types": [
+        "webhook.notification_failed"
+      ],
+      "detection": {
+        "group_by": "target_id",
+        "all_of": [
+          {
+            "event_type": "webhook.notification_failed",
+            "min_count": 3
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-PORTAL-008",
+      "title": "Repeated validation errors by one actor",
+      "rule_version": "1.0.0",
+      "criticality": 1,
+      "mapped_attack_ids": [
+        "validation_error_probing"
+      ],
+      "required_event_types": [
+        "service.validation_error"
+      ],
+      "detection": {
+        "group_by": "actor_id",
+        "all_of": [
+          {
+            "event_type": "service.validation_error",
+            "min_count": 5
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -3,20 +3,203 @@
   "format": "iide-json-rules-v1",
   "description": "Deterministic JSON-rule prototype that is Sigma-compatible in spirit only. It is NOT a Sigma implementation (spec section 3).",
   "rule_pack_id": "billing_api_rules",
-  "rule_pack_version": "1.0.0",
+  "rule_pack_version": "2.0.0",
   "rules": [
     {
       "rule_id": "IIDE-BILLING-001",
       "title": "Repeated failed logins followed by account lockout",
       "rule_version": "1.0.0",
       "criticality": 3,
-      "mapped_attack_ids": ["credential_bruteforce"],
-      "required_event_types": ["auth.login_failed", "auth.lockout"],
+      "mapped_attack_ids": [
+        "credential_bruteforce"
+      ],
+      "required_event_types": [
+        "auth.login_failed",
+        "auth.lockout"
+      ],
       "detection": {
         "group_by": "target_id",
         "all_of": [
-          { "event_type": "auth.login_failed", "min_count": 5 },
-          { "event_type": "auth.lockout", "min_count": 1 }
+          {
+            "event_type": "auth.login_failed",
+            "min_count": 5
+          },
+          {
+            "event_type": "auth.lockout",
+            "min_count": 1
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-BILLING-002",
+      "title": "Admin role granted (auth.role_changed)",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": [
+        "role_escalation"
+      ],
+      "required_event_types": [
+        "auth.role_changed"
+      ],
+      "detection": {
+        "group_by": "target_id",
+        "all_of": [
+          {
+            "event_type": "auth.role_changed",
+            "min_count": 1,
+            "where": {
+              "new_role": {
+                "eq": "admin"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-BILLING-003",
+      "title": "Admin role granted (audit.permission_change)",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": [
+        "role_escalation"
+      ],
+      "required_event_types": [
+        "audit.permission_change"
+      ],
+      "detection": {
+        "group_by": "target_id",
+        "all_of": [
+          {
+            "event_type": "audit.permission_change",
+            "min_count": 1,
+            "where": {
+              "new_role": {
+                "eq": "admin"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-BILLING-004",
+      "title": "Session reused from a different client",
+      "rule_version": "1.0.0",
+      "criticality": 2,
+      "mapped_attack_ids": [
+        "token_replay"
+      ],
+      "required_event_types": [
+        "auth.session_rejected"
+      ],
+      "detection": {
+        "group_by": "target_id",
+        "all_of": [
+          {
+            "event_type": "auth.session_rejected",
+            "min_count": 3,
+            "where": {
+              "reason": {
+                "eq": "client_mismatch"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-BILLING-005",
+      "title": "Large invoice export",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": [
+        "bulk_invoice_export"
+      ],
+      "required_event_types": [
+        "billing.bulk_export"
+      ],
+      "detection": {
+        "group_by": "actor_id",
+        "all_of": [
+          {
+            "event_type": "billing.bulk_export",
+            "min_count": 1,
+            "where": {
+              "record_count": {
+                "gte": 10
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-BILLING-006",
+      "title": "High invoice read volume",
+      "rule_version": "1.0.0",
+      "criticality": 3,
+      "mapped_attack_ids": [
+        "bulk_invoice_export"
+      ],
+      "required_event_types": [
+        "billing.invoice_read"
+      ],
+      "detection": {
+        "group_by": "actor_id",
+        "all_of": [
+          {
+            "event_type": "billing.invoice_read",
+            "min_count": 8
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-BILLING-007",
+      "title": "Webhook redirected to an external target",
+      "rule_version": "1.0.0",
+      "criticality": 2,
+      "mapped_attack_ids": [
+        "webhook_tampering"
+      ],
+      "required_event_types": [
+        "webhook.configuration_changed"
+      ],
+      "detection": {
+        "group_by": "target_id",
+        "all_of": [
+          {
+            "event_type": "webhook.configuration_changed",
+            "min_count": 1,
+            "where": {
+              "external": {
+                "eq": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "rule_id": "IIDE-BILLING-008",
+      "title": "Repeated export rate-limit hits",
+      "rule_version": "1.0.0",
+      "criticality": 1,
+      "mapped_attack_ids": [
+        "rate_limit_abuse"
+      ],
+      "required_event_types": [
+        "api.rate_limit_triggered"
+      ],
+      "detection": {
+        "group_by": "actor_id",
+        "all_of": [
+          {
+            "event_type": "api.rate_limit_triggered",
+            "min_count": 3
+          }
         ]
       }
     }

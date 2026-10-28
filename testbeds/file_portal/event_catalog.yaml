@@ -1,0 +1,155 @@
+# Event catalog for the file_portal testbed (spec section 4.2): 10 event types.
+# PROVISIONAL labels (single annotator, D-10): security_bearing follows the rule-dependency /
+# audit-category criterion. Pre-register S_sec after an independent review, before any agent run.
+- event_type: file.uploaded
+  description: A synthetic file was uploaded
+  owning_module: app.service.PortalService
+  security_bearing: false
+  security_basis: none
+  required_fields:
+  - actor_id
+  - target_id
+  - size_bytes
+  required_by_attacks: []
+  required_by_rules: []
+  benign_absence_expected: false
+  criticality_rationale: Context only. No frozen rule depends on it and it is not in a D-10 audit category.
+- event_type: file.read
+  description: A file was read by an authorized actor
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - owner_id
+  required_by_attacks:
+  - bulk_file_export
+  required_by_rules:
+  - IIDE-PORTAL-003
+  benign_absence_expected: false
+  criticality_rationale: High read volume by one actor precedes bulk collection.
+- event_type: file.access_denied
+  description: An operation on a file, approval or webhook was denied
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - operation
+  - reason
+  required_by_attacks:
+  - unauthorized_access_probing
+  required_by_rules:
+  - IIDE-PORTAL-001
+  benign_absence_expected: true
+  criticality_rationale: Repeated denials by one actor indicate probing for accessible files.
+- event_type: file.bulk_export
+  description: A batch of files was exported
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - file_count
+  required_by_attacks:
+  - bulk_file_export
+  required_by_rules:
+  - IIDE-PORTAL-002
+  benign_absence_expected: true
+  criticality_rationale: Large export volume in one request is the primary bulk-collection signal.
+- event_type: approval.requested
+  description: Access to a file was requested
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - file_id
+  required_by_attacks:
+  - approval_self_approval
+  required_by_rules:
+  - IIDE-PORTAL-006
+  benign_absence_expected: true
+  criticality_rationale: Needed to correlate a decision with its original requester.
+- event_type: approval.completed
+  description: An access request was approved or rejected
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - decision
+  - self_approved
+  required_by_attacks:
+  - approval_self_approval
+  required_by_rules:
+  - IIDE-PORTAL-006
+  benign_absence_expected: true
+  criticality_rationale: self_approved=true shows the requester decided their own request.
+- event_type: audit.sharing_changed
+  description: The visibility of a file was changed
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - previous_visibility
+  - new_visibility
+  required_by_attacks:
+  - public_sharing_exposure
+  required_by_rules:
+  - IIDE-PORTAL-004
+  benign_absence_expected: true
+  criticality_rationale: A change to public visibility exposes the file to everyone.
+- event_type: webhook.notification_sent
+  description: A security notification was delivered to the webhook
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - trigger
+  required_by_attacks:
+  - public_sharing_exposure
+  required_by_rules:
+  - IIDE-PORTAL-005
+  benign_absence_expected: true
+  criticality_rationale: Independent evidence that a public-sharing change was announced (redundant with
+    audit.sharing_changed).
+- event_type: webhook.notification_failed
+  description: A security notification could not be delivered
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - trigger
+  required_by_attacks:
+  - notification_suppression
+  required_by_rules:
+  - IIDE-PORTAL-007
+  benign_absence_expected: true
+  criticality_rationale: Repeated failures to one target mean security notifications are being lost.
+- event_type: service.validation_error
+  description: A request failed input validation
+  owning_module: app.service.PortalService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - error_count
+  required_by_attacks:
+  - validation_error_probing
+  required_by_rules:
+  - IIDE-PORTAL-008
+  benign_absence_expected: true
+  criticality_rationale: Repeated malformed requests by one actor indicate input probing.

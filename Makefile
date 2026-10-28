@@ -1,7 +1,8 @@
 PY ?= .venv/bin/python
 TESTBED ?= billing_api
+TESTBEDS ?= billing_api file_portal
 
-.PHONY: install lint test test-fast testbed-test testbed-validate baseline
+.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all
 
 install:
 	python3 -m venv .venv
@@ -11,24 +12,28 @@ install:
 lint:
 	$(PY) -m ruff check .
 
-# Project tests (unit + integration) and the testbed's own functional tests.
+# Project tests (unit + integration), then each testbed's own functional tests.
 # They run as separate pytest invocations because every testbed exposes a
 # top-level package called `app`.
 test:
 	$(PY) -m pytest
-	$(PY) -m pytest testbeds/$(TESTBED)
+	for tb in $(TESTBEDS); do $(PY) -m pytest testbeds/$$tb -p no:cacheprovider || exit 1; done
 
 test-fast:
 	$(PY) -m pytest -m "not integration"
 
 testbed-test:
-	$(PY) -m pytest testbeds/$(TESTBED)
+	$(PY) -m pytest testbeds/$(TESTBED) -p no:cacheprovider
 
-# Loads the testbed and cross-validates catalog, attacks, rules and mapping.
+# Loads the testbed and cross-validates catalog, attacks, rules, mapping and benign workload.
 testbed-validate:
-	$(PY) scripts/validate_testbed.py --testbed $(TESTBED)
+	for tb in $(TESTBEDS); do $(PY) scripts/validate_testbed.py --testbed $$tb || exit 1; done
 
-# Writes testbeds/$(TESTBED)/baseline/* (k replays per attack plus a 30-replay flake
-# calibration). Refuses to overwrite existing artifacts; add FORCE=--force to redo.
+# Writes testbeds/$(TESTBED)/baseline/* (k replays per attack, a benign negative control and
+# a per-attack flake calibration). Refuses to overwrite existing artifacts; FORCE=--force
+# re-records, which is only legitimate under a new experiment_version.
 baseline:
-	$(PY) scripts/run_baseline.py --testbed $(TESTBED) --calibrate 30 $(FORCE)
+	$(PY) scripts/run_baseline.py --testbed $(TESTBED) $(FORCE)
+
+baseline-all:
+	for tb in $(TESTBEDS); do $(PY) scripts/run_baseline.py --testbed $$tb $(FORCE) || exit 1; done

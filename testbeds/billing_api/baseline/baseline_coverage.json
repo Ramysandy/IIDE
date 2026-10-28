@@ -1,23 +1,25 @@
 {
   "schema_version": "1.0",
-  "experiment_version": "phase1-0.1",
+  "experiment_version": "phase2-0.1",
   "testbed_id": "billing_api",
-  "generated_at": "2026-10-28T00:34:11.636546Z",
-  "git_commit": null,
-  "git_commit_note": "project is not a git repository; no commit to record",
+  "generated_at": "2026-10-28T01:13:41.247259Z",
+  "git_commit": "103f2203a8badeffdb08f35f9394dba6700b6453",
+  "git_commit_note": "git rev-parse HEAD (working tree may contain uncommitted edits)",
   "frozen_hashes": {
-    "rule_pack_hash": "7ef19277fc8f96fe121573dd7f936bdfd6674f9f61c9a1da6e4b461eb5dda685",
-    "attack_set_hash": "4fb3b3327678c11012ca5736dcf43a706bce6b1d622ecc5102caee2765450432",
-    "telemetry_contract_hash": "670e915c902cd8e2077f2be853b4158cf44543cd65e6c2e268ff4c059671e2b5",
-    "detector_engine_hash": "7feb809d6377085ed007c53ef679c2716b2cdf042a5c3f7a6ce148d5350a2c7c",
-    "replay_harness_hash": "860bbbe92f462ddba0956a41f86aaa22e868d0a142aeb0ba2dbe978162d0bdd5",
-    "testbed_source_hash": "c3aec39eddd6c700560c0c21205a1f3772414bd884f1ea61d765fa33063fd1fa"
+    "rule_pack_hash": "f8e7bc2e81200b428971449030bb825deb90ff1534ef67f32ea0e7dab46834e5",
+    "attack_set_hash": "24b02eedd812e774a40f3e6a536d2bf325d071609f5ae94bf39fba4f31aacdbb",
+    "benign_set_hash": "13059df3f90bd5ee29f0b347a25186e62235a7950d5639d418f516934ed4f869",
+    "telemetry_contract_hash": "89189f05a670956eb6019d712a3f2a9066b50aa2c557a78ca619ae4a52593a65",
+    "detector_engine_hash": "78b1dbc76f4a26ec8264bc7a0cbb91e6fee6405480f2dc90efb9d902e3879631",
+    "replay_harness_hash": "d3ad2dd58238511ac14f6d1fe8bebe1d23832a9d22b97020b7e092f876278455",
+    "testbed_source_hash": "0fc61bf9b9e1de0abf69ba05d76b9d4a22a3b642e53201629392efe11de56a8b"
   },
   "replay_config": {
     "schema_version": "1.0",
-    "experiment_version": "phase1-0.1",
+    "experiment_version": "phase2-0.1",
     "min_valid_percent": 80,
     "flake_rate_limit": 0.05,
+    "min_calibration_replays": 30,
     "replay_timeout_seconds": 60,
     "attack_alert_aggregation": "any_expected_rule"
   },
@@ -55,9 +57,29 @@
     "working_directory": "testbeds/billing_api",
     "passed": true,
     "exit_code": 0,
-    "summary_line": "13 passed, 1 warning in 0.56s"
+    "summary_line": "32 passed, 1 warning in 1.96s"
   },
   "attacks": [
+    {
+      "attack_id": "bulk_invoice_export",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-BILLING-005",
+        "IIDE-BILLING-006"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
     {
       "attack_id": "credential_bruteforce",
       "criticality": 3,
@@ -74,14 +96,111 @@
       "outcome_disagreement_rate": 0.0,
       "flake_rate": 0.0,
       "flake_limit": 0.05,
-      "flake_within_limit": true
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "rate_limit_abuse",
+      "criticality": 1,
+      "expected_rule_ids": [
+        "IIDE-BILLING-008"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "role_escalation",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-BILLING-002",
+        "IIDE-BILLING-003"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "token_replay",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-BILLING-004"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "webhook_tampering",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-BILLING-007"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
     }
   ],
+  "calibration_replays_per_attack": 30,
+  "negative_control": {
+    "replays": 5,
+    "valid_replays": 5,
+    "raw_event_counts": [
+      21,
+      21,
+      21,
+      21,
+      21
+    ],
+    "fired_rule_ids": [],
+    "schema_invalid_event_count": 0
+  },
   "baseline_detected_attack_ids": [
-    "credential_bruteforce"
+    "bulk_invoice_export",
+    "credential_bruteforce",
+    "rate_limit_abuse",
+    "role_escalation",
+    "token_replay",
+    "webhook_tampering"
   ],
-  "phase1_exit_criterion_met": true,
+  "exit_criterion_met": true,
   "exit_criterion_notes": [
-    "all Phase 1 baseline checks passed"
+    "all baseline checks passed"
   ]
 }

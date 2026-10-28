@@ -1,41 +1,189 @@
-# Event catalog for the billing_api testbed (spec section 4.2).
-# Phase 1 covers only the three authentication events needed by the vertical slice.
-# Phase 2 extends this to the 10-20 event types listed in spec section 5.1.
-#
-# PROVISIONAL: the `security_bearing` labels are Phase 1 working labels. The set
-# S_sec used by CAI (spec 7.8) must be pre-registered in Phase 2 before any agent run.
+# Event catalog for the billing_api testbed (spec section 4.2): 12 event types.
+# PROVISIONAL labels: security_bearing follows the D-10 rule (rule dependency or audit
+# category) and was assigned by a single annotator. Pre-register S_sec after a second
+# independent review and before any agent run.
 - event_type: auth.login_success
   description: A login attempt succeeded
-  owning_module: app.service.AuthService
+  owning_module: app.service.BillingService
   security_bearing: false
-  required_fields: [actor_id, target_id]
+  security_basis: none
+  required_fields:
+  - actor_id
+  - target_id
   required_by_attacks: []
   required_by_rules: []
   benign_absence_expected: false
-  criticality_rationale: >
-    Provides baseline context only. No Phase 1 attack or rule depends on it,
-    so it is provisionally labelled non-security-bearing.
-
+  criticality_rationale: Context only. No frozen rule depends on it and it is not in an audit category.
 - event_type: auth.login_failed
   description: A login attempt failed (bad credentials, or attempt against a locked account)
-  owning_module: app.service.AuthService
+  owning_module: app.service.BillingService
   security_bearing: true
-  required_fields: [actor_id, target_id, failure_count]
-  required_by_attacks: [credential_bruteforce]
-  required_by_rules: [IIDE-BILLING-001]
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - failure_count
+  required_by_attacks:
+  - credential_bruteforce
+  required_by_rules:
+  - IIDE-BILLING-001
   benign_absence_expected: false
-  criticality_rationale: >
-    Direct evidence of repeated failed authentication; the brute-force rule
-    thresholds on its per-account count.
-
+  criticality_rationale: Direct evidence of repeated failed authentication; the brute-force rule thresholds
+    on its per-account count.
 - event_type: auth.lockout
   description: An account was locked after reaching the failed-login threshold
-  owning_module: app.service.AuthService
+  owning_module: app.service.BillingService
   security_bearing: true
-  required_fields: [actor_id, target_id, failure_count, threshold]
-  required_by_attacks: [credential_bruteforce]
-  required_by_rules: [IIDE-BILLING-001]
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - failure_count
+  - threshold
+  required_by_attacks:
+  - credential_bruteforce
+  required_by_rules:
+  - IIDE-BILLING-001
   benign_absence_expected: true
-  criticality_rationale: >
-    Corroborating evidence that the threshold was crossed; absent in benign
-    traffic that never reaches the lockout threshold.
+  criticality_rationale: Corroborating evidence that the threshold was crossed; absent in benign traffic
+    below the threshold.
+- event_type: auth.session_rejected
+  description: A request was rejected because its session was unknown, used from another client, or lacked
+    the role
+  owning_module: app.service.BillingService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - reason
+  required_by_attacks:
+  - token_replay
+  required_by_rules:
+  - IIDE-BILLING-004
+  benign_absence_expected: true
+  criticality_rationale: Session reuse from a different client (reason=client_mismatch) is the token-replay
+    signal.
+- event_type: auth.role_changed
+  description: An account's role was changed
+  owning_module: app.service.BillingService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - previous_role
+  - new_role
+  required_by_attacks:
+  - role_escalation
+  required_by_rules:
+  - IIDE-BILLING-002
+  benign_absence_expected: true
+  criticality_rationale: A grant of the admin role is a privilege escalation signal.
+- event_type: audit.permission_change
+  description: Audit record of a permission change
+  owning_module: app.service.BillingService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - previous_role
+  - new_role
+  - privilege_delta
+  required_by_attacks:
+  - role_escalation
+  required_by_rules:
+  - IIDE-BILLING-003
+  benign_absence_expected: true
+  criticality_rationale: Independent audit-trail evidence of the same escalation (redundant with auth.role_changed).
+- event_type: billing.invoice_read
+  description: A synthetic invoice was read
+  owning_module: app.service.BillingService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - account_id
+  required_by_attacks:
+  - bulk_invoice_export
+  required_by_rules:
+  - IIDE-BILLING-006
+  benign_absence_expected: false
+  criticality_rationale: High read volume by one client precedes bulk collection.
+- event_type: billing.bulk_export
+  description: A batch of synthetic invoices was exported
+  owning_module: app.service.BillingService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - record_count
+  required_by_attacks:
+  - bulk_invoice_export
+  required_by_rules:
+  - IIDE-BILLING-005
+  benign_absence_expected: true
+  criticality_rationale: Large export volume in one request is the primary bulk-collection signal.
+- event_type: api.rate_limit_triggered
+  description: A client exceeded the export rate limit
+  owning_module: app.service.BillingService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - limit
+  - observed
+  required_by_attacks:
+  - rate_limit_abuse
+  required_by_rules:
+  - IIDE-BILLING-008
+  benign_absence_expected: true
+  criticality_rationale: Repeated limit hits show sustained abuse of a throttled endpoint.
+- event_type: webhook.configuration_changed
+  description: The notification webhook target was changed
+  owning_module: app.service.BillingService
+  security_bearing: true
+  security_basis: rule_dependency
+  required_fields:
+  - actor_id
+  - target_id
+  - previous_target
+  - new_target
+  - external
+  required_by_attacks:
+  - webhook_tampering
+  required_by_rules:
+  - IIDE-BILLING-007
+  benign_absence_expected: true
+  criticality_rationale: Redirecting notifications to an external target can leak or suppress alerts.
+- event_type: webhook.delivery_failed
+  description: A webhook notification could not be delivered
+  owning_module: app.service.BillingService
+  security_bearing: true
+  security_basis: audit_category
+  required_fields:
+  - actor_id
+  - target_id
+  - trigger
+  required_by_attacks: []
+  required_by_rules: []
+  benign_absence_expected: true
+  criticality_rationale: Failed delivery means security notifications may be silently lost. No Phase 2
+    rule consumes it.
+- event_type: service.validation_error
+  description: A request failed input validation
+  owning_module: app.main
+  security_bearing: false
+  security_basis: none
+  required_fields:
+  - actor_id
+  - target_id
+  - error_count
+  required_by_attacks: []
+  required_by_rules: []
+  benign_absence_expected: true
+  criticality_rationale: Not in a D-10 audit category and no Phase 2 billing rule depends on it.

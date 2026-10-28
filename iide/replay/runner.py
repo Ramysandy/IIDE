@@ -20,6 +20,7 @@ from iide.models import (
     AttackBaseline,
     AttackDefinition,
     FunctionalTestResult,
+    NegativeControl,
     ReplayRecord,
     RuleOutcomeRecord,
     load_attack_definition,
@@ -59,6 +60,11 @@ class Testbed:
     def emulation_path(self, attack: AttackDefinition) -> Path:
         return self.root / "attacks" / attack.emulation
 
+    @property
+    def benign_path(self) -> Path:
+        """Fixed benign workload used for negative controls (and NRG later)."""
+        return self.root / "benign" / "benign_workload.py"
+
 
 def load_testbed(root: Path, *, schema_path: Path = DEFAULT_TELEMETRY_SCHEMA) -> Testbed:
     """Load every frozen artifact of a testbed and cross-validate them."""
@@ -92,6 +98,9 @@ def cross_reference_problems(tb: Testbed) -> list[str]:
     """Consistency of attack -> rule -> event-type -> catalog references (spec 4.2-4.4)."""
     problems: list[str] = []
     rules = {r.rule_id: r for r in tb.detector.pack.rules}
+    if not tb.benign_path.is_file():
+        problems.append(f"benign workload {tb.benign_path.name} not found in benign/")
+    top_level = set(json.loads(tb.schema_path.read_text(encoding="utf-8"))["properties"])
 
     for attack in tb.attacks.values():
         if not tb.emulation_path(attack).is_file():
@@ -127,6 +136,19 @@ def cross_reference_problems(tb: Testbed) -> list[str]:
         for attack_id in rule.mapped_attack_ids:
             if attack_id not in tb.attacks:
                 problems.append(f"{rule.rule_id}: maps unknown attack {attack_id}")
+            elif rule.rule_id not in tb.attacks[attack_id].expected_rule_ids:
+                problems.append(
+                    f"{rule.rule_id}: {attack_id} does not list it in expected_rule_ids"
+                )
+        for clause in rule.detection.all_of:
+            entry = tb.catalog.get(clause.event_type)
+            for field in clause.where:
+                # Spec 4.1: fields needed by rules must be schema-defined.
+                if field not in top_level and (entry is None or field not in entry.required_fields):
+                    problems.append(
+                        f"{rule.rule_id}: field {field!r} is not schema-defined for "
+                        f"{clause.event_type}"
+                    )
         for event_type in rule.required_event_types:
             if event_type not in tb.catalog:
                 problems.append(f"{rule.rule_id}: event type {event_type} not in catalog")
@@ -155,6 +177,7 @@ def compute_frozen_hashes(tb: Testbed) -> dict[str, str]:
             tb.root, ["detection/rules/*.json", "detection/mapping.json"]
         ),
         "attack_set_hash": hash_patterns(tb.root, ["attacks/*"]),
+        "benign_set_hash": hash_patterns(tb.root, ["benign/*"]),
         "telemetry_contract_hash": sha256_bytes(
             (
                 f"{sha256_file(tb.schema_path)}\n{sha256_file(tb.root / 'event_catalog.yaml')}\n"
@@ -235,6 +258,59 @@ def read_events(sink: Path) -> tuple[list[dict[str, Any]], int]:
     return events, malformed
 
 
+@dataclass(frozen=True)
+class ScenarioRun:
+    """Raw outcome of executing one emulation in a fresh instance."""
+
+    events: list[dict[str, Any]]
+    malformed_line_count: int
+    elapsed_seconds: float
+    error_category: str | None  # TIMEOUT / INFRA_ERROR; None when the scenario completed
+    error_detail: str | None
+
+
+def run_scenario(
+    tb: Testbed, emulation_path: Path, correlation_id: str, timeout_seconds: int
+) -> ScenarioRun:
+    """Run one emulation in a fresh process and collect its raw telemetry (spec 6.2 steps 1-4)."""
+    with tempfile.TemporaryDirectory(prefix="iide-replay-") as tmp:
+        workdir = Path(tmp)
+        sink = workdir / "events.jsonl"
+        sink.touch()  # the oracle creates the sink; a missing sink afterwards is an infra error
+        result = run_in_fresh_process(
+            testbed_dir=tb.root,
+            emulation_path=emulation_path,
+            sink_path=sink,
+            correlation_id=correlation_id,
+            timeout_seconds=timeout_seconds,
+            workdir=workdir,
+        )
+
+        def failed(category: str, detail: str) -> ScenarioRun:
+            return ScenarioRun([], 0, result.elapsed_seconds, category, detail[-2000:])
+
+        if result.timed_out:
+            return failed("TIMEOUT", f"scenario exceeded {timeout_seconds}s")
+        if result.exit_code != 0:
+            return failed(
+                "INFRA_ERROR", f"worker exit code {result.exit_code}: {result.stderr_tail}"
+            )
+        if not sink.is_file():
+            return failed("INFRA_ERROR", "event sink file disappeared during the scenario")
+        events, malformed = read_events(sink)
+    return ScenarioRun(events, malformed, result.elapsed_seconds, None, None)
+
+
+def evaluate_events(tb: Testbed, raw_events: list[dict[str, Any]]):
+    """Normalize, schema-validate and run every frozen rule (spec 6.2 steps 5-7).
+
+    Returns (schema_valid_events, schema_invalid_count, rule_results).
+    """
+    normalized = normalize_events(raw_events)
+    schema_valid = [e for e in normalized if not validate_event(e, tb.schema_path)]
+    return schema_valid, len(normalized) - len(schema_valid), tb.detector.evaluate(schema_valid)
+
+
 def run_single_replay(
     tb: Testbed,
     attack: AttackDefinition,
@@ -257,58 +333,37 @@ def run_single_replay(
         "correlation_id": correlation_id,
     }
     started = _utc_now()
-    emulation = emulation_path or tb.emulation_path(attack)
-
-    with tempfile.TemporaryDirectory(prefix="iide-replay-") as tmp:
-        workdir = Path(tmp)
-        sink = workdir / "events.jsonl"
-        sink.touch()  # the oracle creates the sink; a missing sink afterwards is an infra error
-        result = run_in_fresh_process(
-            testbed_dir=tb.root,
-            emulation_path=emulation,
-            sink_path=sink,
-            correlation_id=correlation_id,
-            timeout_seconds=config.replay_timeout_seconds,
-            workdir=workdir,
+    run = run_scenario(
+        tb,
+        emulation_path or tb.emulation_path(attack),
+        correlation_id,
+        config.replay_timeout_seconds,
+    )
+    if run.error_category is not None:
+        return ReplayRecord(
+            **base,
+            started_at=_iso(started),
+            elapsed_seconds=run.elapsed_seconds,
+            valid=False,
+            error_category=run.error_category,
+            error_detail=run.error_detail,
         )
 
-        def invalid(category: str, detail: str) -> ReplayRecord:
-            return ReplayRecord(
-                **base,
-                started_at=_iso(started),
-                elapsed_seconds=result.elapsed_seconds,
-                valid=False,
-                error_category=category,
-                error_detail=detail[-2000:],
-            )
-
-        if result.timed_out:
-            return invalid("TIMEOUT", f"replay exceeded {config.replay_timeout_seconds}s")
-        if result.exit_code != 0:
-            return invalid(
-                "INFRA_ERROR", f"worker exit code {result.exit_code}: {result.stderr_tail}"
-            )
-        if not sink.is_file():
-            return invalid("INFRA_ERROR", "event sink file disappeared during replay")
-        raw_events, malformed = read_events(sink)
-
-    normalized = normalize_events(raw_events)
-    schema_valid = [e for e in normalized if not validate_event(e, tb.schema_path)]
-    outcomes = tb.detector.evaluate(schema_valid)
+    _, schema_invalid, outcomes = evaluate_events(tb, run.events)
     expected = set(attack.expected_rule_ids)
     fired_expected = [o for o in outcomes if o.rule_id in expected and o.fired]
     redundancy = sorted({t for o in fired_expected for t in o.matched_event_types})
     return ReplayRecord(
         **base,
         started_at=_iso(started),
-        elapsed_seconds=result.elapsed_seconds,
+        elapsed_seconds=run.elapsed_seconds,
         valid=True,
-        raw_event_count=len(raw_events),
+        raw_event_count=len(run.events),
         distinct_event_type_count=len(
-            {e["event_type"] for e in raw_events if isinstance(e.get("event_type"), str)}
+            {e["event_type"] for e in run.events if isinstance(e.get("event_type"), str)}
         ),
-        malformed_line_count=malformed,
-        schema_invalid_event_count=len(normalized) - len(schema_valid),
+        malformed_line_count=run.malformed_line_count,
+        schema_invalid_event_count=schema_invalid,
         rule_outcomes=[
             RuleOutcomeRecord(
                 rule_id=o.rule_id, fired=o.fired, matched_event_types=list(o.matched_event_types)
@@ -340,6 +395,30 @@ def run_attack_replays(
     ]
 
 
+def run_benign_replays(tb: Testbed, config: ReplayConfig, n: int) -> NegativeControl:
+    """Replay the fixed benign workload n times; no frozen rule should ever fire."""
+    if n < 1:
+        raise ValueError("n must be >= 1")
+    fired: set[str] = set()
+    counts: list[int] = []
+    schema_invalid = 0
+    for i in range(1, n + 1):
+        run = run_scenario(tb, tb.benign_path, f"benign-{i:03d}", config.replay_timeout_seconds)
+        if run.error_category is not None:
+            continue
+        _, invalid, outcomes = evaluate_events(tb, run.events)
+        counts.append(len(run.events))
+        schema_invalid += invalid
+        fired |= {o.rule_id for o in outcomes if o.fired}
+    return NegativeControl(
+        replays=n,
+        valid_replays=len(counts),
+        raw_event_counts=counts,
+        fired_rule_ids=sorted(fired),
+        schema_invalid_event_count=schema_invalid,
+    )
+
+
 def summarize_attack(
     attack: AttackDefinition, records: list[ReplayRecord], config: ReplayConfig
 ) -> AttackBaseline:
@@ -351,6 +430,14 @@ def summarize_attack(
     planned_k = len(records)
     valid = [r for r in records if r.valid]
     fired = sum(1 for r in valid if r.attack_alert_fired)
+    unexpected = sorted(
+        {
+            o.rule_id
+            for r in valid
+            for o in r.rule_outcomes
+            if o.fired and o.rule_id not in attack.expected_rule_ids
+        }
+    )
     decision = attack_detected(
         fired, len(valid), planned_k, min_valid_percent=config.min_valid_percent
     )
@@ -370,4 +457,5 @@ def summarize_attack(
         flake_rate=rate,
         flake_limit=config.flake_rate_limit,
         flake_within_limit=flake_within_limit(rate, config.flake_rate_limit),
+        unexpected_fired_rule_ids=unexpected,
     )

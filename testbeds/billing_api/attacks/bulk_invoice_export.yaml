@@ -1,0 +1,19 @@
+# Research label only; the technique mapping and ATT&CK version are NOT validated (spec 4.3).
+# criticality is a PROVISIONAL single-annotator value (spec 8.1 requires two blinded annotators).
+schema_version: '1.0'
+id: bulk_invoice_export
+technique_id: T1213
+technique_mapping_status: UNVERIFIED
+attack_framework_version: null
+criticality: 3
+criticality_status: PROVISIONAL
+description: 'An analyst session reads eight synthetic invoices and exports twelve in one request. Safe
+  emulation: synthetic identifiers only, in-process requests, no real credentials or targets.'
+required_event_types:
+- billing.bulk_export
+- billing.invoice_read
+expected_rule_ids:
+- IIDE-BILLING-005
+- IIDE-BILLING-006
+replay_count: 5
+emulation: bulk_invoice_export.py

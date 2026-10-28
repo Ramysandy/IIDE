@@ -4,10 +4,12 @@ A reproducible research harness for measuring whether ordinary maintenance instr
 agent to remove or degrade security telemetry that a frozen detection pipeline relies on, even when
 functional tests still pass.
 
-> **Status: Phase 1 only (minimal vertical slice).** One toy endpoint, one safe synthetic attack, one frozen
-> rule, fresh-instance replay and a baseline result. There is no agent runner, no scoring library, no second
-> testbed and no experimental result yet. The research gap has **not** been verified as novel; the Phase 0
-> prior-art gate (G1) is still open.
+> **Status: Phase 2 (two pilot testbeds).** `billing_api` and `file_portal`, each with 10-12 event
+> types, 6 safe synthetic attacks, a frozen 8-rule pack, a benign negative-control workload and baseline
+> artifacts. There is no agent runner, no scoring library and no experimental result yet. Gate **G2**
+> (inter-annotator kappa >= 0.6) is **not met**: criticality weights, `security_bearing` labels and ATT&CK
+> mappings are provisional single-annotator values. The research gap has **not** been verified as novel;
+> the Phase 0 prior-art gate (G1) is still open.
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source
@@ -22,16 +24,17 @@ send synthetic requests to it and contact no external system.
 
 ```bash
 make install          # creates .venv and installs the package with dev tools
-make test             # project tests + the testbed's functional tests
-make baseline         # records testbeds/billing_api/baseline/* (refuses to overwrite)
+make test             # project tests + each testbed's functional tests
+make baseline-all     # records testbeds/*/baseline/* (refuses to overwrite; FORCE=--force)
 ```
 
-## Layout (Phase 1)
+## Layout (Phase 2)
 
 ```text
 configs/replay.yaml            frozen replay settings (k policy, flake limit, timeout)
 schemas/                       canonical telemetry event JSON Schema
-testbeds/billing_api/          toy service + catalog + attack + frozen rule + baseline artifacts
+testbeds/billing_api/          billing/auth API: service, catalog, attacks, benign workload, rules, baseline
+testbeds/file_portal/          file portal: same layout
 iide/                          oracle side: schema, normalizer, detector, replay, reliability, hashing
 scripts/                       run_baseline.py, validate_testbed.py
 tests/                         unit, integration, fixtures

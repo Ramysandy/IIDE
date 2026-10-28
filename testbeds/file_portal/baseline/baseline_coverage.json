@@ -1,0 +1,206 @@
+{
+  "schema_version": "1.0",
+  "experiment_version": "phase2-0.1",
+  "testbed_id": "file_portal",
+  "generated_at": "2026-10-28T01:18:05.408813Z",
+  "git_commit": "103f2203a8badeffdb08f35f9394dba6700b6453",
+  "git_commit_note": "git rev-parse HEAD (working tree may contain uncommitted edits)",
+  "frozen_hashes": {
+    "rule_pack_hash": "649848585991ee06a6dee7b78de83accc19690809653e0ca265bb33c94461c48",
+    "attack_set_hash": "3b69981c4c1e4266db9b976eb68221c038dbe03545c7989fe10bb00b7db062bd",
+    "benign_set_hash": "cc4e690abc7dc77bb2617aa40411de1ec5ae5c1d82e981aebe5b6476e39d524c",
+    "telemetry_contract_hash": "16fab59ba426388b5f8075778b7c38497fff0612892dd2e81f7f82c675833e16",
+    "detector_engine_hash": "78b1dbc76f4a26ec8264bc7a0cbb91e6fee6405480f2dc90efb9d902e3879631",
+    "replay_harness_hash": "d3ad2dd58238511ac14f6d1fe8bebe1d23832a9d22b97020b7e092f876278455",
+    "testbed_source_hash": "50840540b52a7becf744dbf7f85f015e220f64c3819c92d63e574190b82daa07"
+  },
+  "replay_config": {
+    "schema_version": "1.0",
+    "experiment_version": "phase2-0.1",
+    "min_valid_percent": 80,
+    "flake_rate_limit": 0.05,
+    "min_calibration_replays": 30,
+    "replay_timeout_seconds": 60,
+    "attack_alert_aggregation": "any_expected_rule"
+  },
+  "environment": {
+    "python": "3.13.5",
+    "implementation": "CPython",
+    "platform": "macOS-10.16-x86_64-i386-64bit-Mach-O",
+    "packages": {
+      "fastapi": "0.162.0",
+      "starlette": "1.10.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.14.1",
+      "jsonschema": "4.26.0",
+      "PyYAML": "6.0.3",
+      "pytest": "9.2.0"
+    }
+  },
+  "isolation": {
+    "level": "fresh Python subprocess per replay (python -I -B), scrubbed env, own temp dir and sink",
+    "container": false,
+    "network_blocked": false,
+    "service_binds_socket": false,
+    "note": "App is driven in-process via a test client. See DECISIONS.md D-03."
+  },
+  "functional_tests": {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "tests",
+      "-q",
+      "-p",
+      "no:cacheprovider"
+    ],
+    "working_directory": "testbeds/file_portal",
+    "passed": true,
+    "exit_code": 0,
+    "summary_line": "25 passed, 1 warning in 1.13s"
+  },
+  "attacks": [
+    {
+      "attack_id": "approval_self_approval",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-006"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "bulk_file_export",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-002",
+        "IIDE-PORTAL-003"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "notification_suppression",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-007"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "public_sharing_exposure",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-004",
+        "IIDE-PORTAL-005"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "unauthorized_access_probing",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-001"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "validation_error_probing",
+      "criticality": 1,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-008"
+      ],
+      "planned_k": 5,
+      "valid_replays": 5,
+      "fired_count": 5,
+      "min_valid_required": 4,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    }
+  ],
+  "calibration_replays_per_attack": 30,
+  "negative_control": {
+    "replays": 5,
+    "valid_replays": 5,
+    "raw_event_counts": [
+      19,
+      19,
+      19,
+      19,
+      19
+    ],
+    "fired_rule_ids": [],
+    "schema_invalid_event_count": 0
+  },
+  "baseline_detected_attack_ids": [
+    "approval_self_approval",
+    "bulk_file_export",
+    "notification_suppression",
+    "public_sharing_exposure",
+    "unauthorized_access_probing",
+    "validation_error_probing"
+  ],
+  "exit_criterion_met": true,
+  "exit_criterion_notes": [
+    "all baseline checks passed"
+  ]
+}

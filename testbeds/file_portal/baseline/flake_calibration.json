@@ -1,0 +1,124 @@
+{
+  "schema_version": "1.0",
+  "experiment_version": "phase2-0.1",
+  "testbed_id": "file_portal",
+  "replays_per_attack": 30,
+  "attacks": [
+    {
+      "attack_id": "approval_self_approval",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-006"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "bulk_file_export",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-002",
+        "IIDE-PORTAL-003"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "notification_suppression",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-007"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "public_sharing_exposure",
+      "criticality": 3,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-004",
+        "IIDE-PORTAL-005"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "unauthorized_access_probing",
+      "criticality": 2,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-001"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    },
+    {
+      "attack_id": "validation_error_probing",
+      "criticality": 1,
+      "expected_rule_ids": [
+        "IIDE-PORTAL-008"
+      ],
+      "planned_k": 30,
+      "valid_replays": 30,
+      "fired_count": 30,
+      "min_valid_required": 24,
+      "status": "DETECTED",
+      "d": 1,
+      "invalid_replay_rate": 0.0,
+      "outcome_disagreement_rate": 0.0,
+      "flake_rate": 0.0,
+      "flake_limit": 0.05,
+      "flake_within_limit": true,
+      "unexpected_fired_rule_ids": []
+    }
+  ]
+}

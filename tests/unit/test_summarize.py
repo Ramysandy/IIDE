@@ -3,7 +3,7 @@
 import pytest
 from conftest import BILLING_ROOT
 
-from iide.models import ReplayRecord, load_attack_definition
+from iide.models import ReplayRecord, RuleOutcomeRecord, load_attack_definition
 from iide.replay.runner import summarize_attack
 
 ATTACK = load_attack_definition(BILLING_ROOT / "attacks" / "credential_bruteforce.yaml")
@@ -71,6 +71,21 @@ def test_invalid_replays_are_never_counted_as_fired_or_silent(config):
     records = _records([True] * 5, invalid={4})
     assert records[4].attack_alert_fired is None
     assert summarize_attack(ATTACK, records, config).fired_count == 4
+
+
+def test_rules_firing_outside_the_expected_set_are_reported_as_cross_fire(config):
+    clean = _records([True] * 5)
+    assert summarize_attack(ATTACK, clean, config).unexpected_fired_rule_ids == []
+    noisy = _records([True] * 5)
+    noisy[2] = noisy[2].model_copy(
+        update={
+            "rule_outcomes": [
+                RuleOutcomeRecord(rule_id="IIDE-BILLING-001", fired=True, matched_event_types=[]),
+                RuleOutcomeRecord(rule_id="IIDE-BILLING-008", fired=True, matched_event_types=[]),
+            ]
+        }
+    )
+    assert summarize_attack(ATTACK, noisy, config).unexpected_fired_rule_ids == ["IIDE-BILLING-008"]
 
 
 def test_empty_and_foreign_records_are_rejected(config):

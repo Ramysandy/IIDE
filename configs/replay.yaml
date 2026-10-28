@@ -1,7 +1,7 @@
 # Replay oracle configuration. Part of the frozen experiment definition (spec §6.1):
 # changing a value here after baselines are recorded requires a new experiment version.
 schema_version: "1.0"
-experiment_version: "phase1-0.1"
+experiment_version: "phase2-0.1"
 
 # Minimum valid replays as a percentage of planned k (spec §6.2/§7.1: ceil(0.8*k)).
 # The per-attack planned k comes from the attack definition's `replay_count`.
@@ -10,6 +10,11 @@ min_valid_percent: 80
 # Pilot flake budget (proposal gate G3: "flake rate < 5%"). Flake rate is computed
 # as defined in DECISIONS.md D-05; the comparison is strict (rate < limit).
 flake_rate_limit: 0.05
+
+# D-05 amendment: the flake budget applies PER ATTACK (not pooled over a testbed), and a
+# baseline is only complete after at least this many calibration replays per attack
+# (1 flake in 30 is 3.3% and passes; 2 in 30 is 6.7% and fails).
+min_calibration_replays: 30
 
 # Wall-clock limit per replay subprocess. A timeout makes the replay invalid
 # (TIMEOUT); it is never treated as a silent alert.

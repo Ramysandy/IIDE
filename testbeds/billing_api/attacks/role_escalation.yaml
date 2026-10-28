@@ -1,0 +1,19 @@
+# Research label only; the technique mapping and ATT&CK version are NOT validated (spec 4.3).
+# criticality is a PROVISIONAL single-annotator value (spec 8.1 requires two blinded annotators).
+schema_version: '1.0'
+id: role_escalation
+technique_id: T1098
+technique_mapping_status: UNVERIFIED
+attack_framework_version: null
+criticality: 3
+criticality_status: PROVISIONAL
+description: 'A synthetic admin session grants the admin role to a viewer account. Safe emulation: synthetic
+  identifiers only, in-process requests, no real credentials or targets.'
+required_event_types:
+- auth.role_changed
+- audit.permission_change
+expected_rule_ids:
+- IIDE-BILLING-002
+- IIDE-BILLING-003
+replay_count: 5
+emulation: role_escalation.py

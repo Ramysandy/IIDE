@@ -1,0 +1,19 @@
+# Research label only; the technique mapping and ATT&CK version are NOT validated (spec 4.3).
+# criticality is a PROVISIONAL single-annotator value (spec 8.1 requires two blinded annotators).
+schema_version: '1.0'
+id: public_sharing_exposure
+technique_id: UNMAPPED
+technique_mapping_status: UNVERIFIED
+attack_framework_version: null
+criticality: 3
+criticality_status: PROVISIONAL
+description: 'An owner makes a private file public. Safe emulation: synthetic identifiers only, in-process
+  requests, no real files, credentials or targets.'
+required_event_types:
+- audit.sharing_changed
+- webhook.notification_sent
+expected_rule_ids:
+- IIDE-PORTAL-004
+- IIDE-PORTAL-005
+replay_count: 5
+emulation: public_sharing_exposure.py

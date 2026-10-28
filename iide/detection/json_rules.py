@@ -2,23 +2,67 @@
 
 This is a Sigma-compatible *prototype* (spec section 3), not a Sigma implementation.
 A rule groups events by one field and fires when, for at least one group, every
-`all_of` clause is satisfied (the group has at least `min_count` events of the
-clause's `event_type`). Rules never inspect `event_id` or timestamps, so results
+`all_of` clause is satisfied: the group has at least `min_count` events of the clause's
+`event_type` whose fields satisfy the clause's optional `where` conditions.
+
+`where` maps a field name to exactly one condition, `{"eq": v}` or `{"gte": n}`. The
+field is looked up at the event's top level first, then in `attributes`. `eq` requires
+the same JSON type (`true` never equals `1`); `gte` accepts only real numbers. A
+missing field never matches. Rules never inspect `event_id` or timestamps, so results
 cannot depend on random identifiers (spec 4.1).
 """
 
 from __future__ import annotations
 
 import json
-from collections import Counter, defaultdict
+import re
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictBool,
+    StrictFloat,
+    StrictInt,
+    StrictStr,
+    model_validator,
+)
 
 from iide.detection.interface import RuleResult
 from iide.hashing import canonical_json_hash
+
+_MISSING = object()
+
+
+class Condition(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    eq: StrictStr | StrictBool | StrictInt | StrictFloat | None = None
+    gte: StrictInt | StrictFloat | None = None
+
+    @model_validator(mode="after")
+    def _exactly_one_operator(self) -> Condition:
+        provided = self.model_fields_set & {"eq", "gte"}
+        if len(provided) != 1:
+            raise ValueError("a condition needs exactly one of 'eq' or 'gte'")
+        if getattr(self, next(iter(provided))) is None:
+            raise ValueError("condition value must not be null")
+        return self
+
+    def matches(self, value: Any) -> bool:
+        if value is _MISSING:
+            return False
+        if "eq" in self.model_fields_set:
+            return type(value) is type(self.eq) and value == self.eq
+        return (
+            isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and self.gte is not None
+            and value >= self.gte
+        )
 
 
 class Clause(BaseModel):
@@ -26,6 +70,14 @@ class Clause(BaseModel):
 
     event_type: str = Field(pattern=r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
     min_count: int = Field(ge=1)
+    where: dict[str, Condition] = {}
+
+    @model_validator(mode="after")
+    def _where_field_names(self) -> Clause:
+        for name in self.where:
+            if not re.fullmatch(r"[a-z][a-z0-9_]*", name):
+                raise ValueError(f"invalid where field name {name!r}")
+        return self
 
 
 class DetectionSpec(BaseModel):
@@ -81,6 +133,15 @@ class RulePack(BaseModel):
         return self
 
 
+def _lookup(event: Mapping[str, Any], field: str) -> Any:
+    if field in event:
+        return event[field]
+    attributes = event.get("attributes")
+    if isinstance(attributes, Mapping) and field in attributes:
+        return attributes[field]
+    return _MISSING
+
+
 class JsonRuleDetector:
     def __init__(self, pack: RulePack) -> None:
         self.pack = pack
@@ -108,16 +169,22 @@ class JsonRuleDetector:
     @staticmethod
     def _evaluate_rule(rule: Rule, events: Sequence[Mapping[str, Any]]) -> RuleResult:
         spec = rule.detection
-        groups: dict[str, Counter[str]] = defaultdict(Counter)
+        clauses = spec.all_of
+        groups: dict[str, list[int]] = {}
         for event in events:
             key = event.get(spec.group_by)
             event_type = event.get("event_type")
-            if isinstance(key, str) and isinstance(event_type, str):
-                groups[key][event_type] += 1
+            if not isinstance(key, str) or not isinstance(event_type, str):
+                continue
+            for i, clause in enumerate(clauses):
+                if clause.event_type != event_type:
+                    continue
+                if all(c.matches(_lookup(event, f)) for f, c in clause.where.items()):
+                    groups.setdefault(key, [0] * len(clauses))[i] += 1
         fired = any(
-            all(counts[c.event_type] >= c.min_count for c in spec.all_of)
+            all(counts[i] >= c.min_count for i, c in enumerate(clauses))
             for counts in groups.values()
         )
         if not fired:
             return RuleResult(rule.rule_id, False, ())
-        return RuleResult(rule.rule_id, True, tuple(sorted({c.event_type for c in spec.all_of})))
+        return RuleResult(rule.rule_id, True, tuple(sorted({c.event_type for c in clauses})))

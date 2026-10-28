@@ -54,7 +54,9 @@ def test_single_replay_fires_and_records_event_accounting(testbed, config):
     assert record.firing_rule_count == 1
     assert record.redundancy_event_types == ["auth.lockout", "auth.login_failed"]
     assert record.redundancy_event_type_count == 2
-    assert [(o.rule_id, o.fired) for o in record.rule_outcomes] == [("IIDE-BILLING-001", True)]
+    # Every frozen rule is evaluated; only the mapped one fires.
+    assert len(record.rule_outcomes) == len(testbed.detector.rule_ids)
+    assert {o.rule_id for o in record.rule_outcomes if o.fired} == {"IIDE-BILLING-001"}
 
 
 def test_replays_run_in_fresh_instances_with_no_state_leakage(testbed):
@@ -99,7 +101,7 @@ def test_negative_control_benign_traffic_does_not_fire_the_rule(testbed):
     events = _events_for(testbed, FIXTURES / "benign_logins.py")
     assert events, "benign scenario should still produce telemetry"
     outcomes = testbed.detector.evaluate(events)
-    assert [o.fired for o in outcomes] == [False]
+    assert not any(o.fired for o in outcomes)
     assert "auth.lockout" not in {e["event_type"] for e in events}
 
 

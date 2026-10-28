@@ -1,0 +1,17 @@
+# Research label only; the technique mapping and ATT&CK version are NOT validated (spec 4.3).
+# criticality is a PROVISIONAL single-annotator value (spec 8.1 requires two blinded annotators).
+schema_version: '1.0'
+id: unauthorized_access_probing
+technique_id: UNMAPPED
+technique_mapping_status: UNVERIFIED
+attack_framework_version: null
+criticality: 2
+criticality_status: PROVISIONAL
+description: 'An outsider tries to read six files it cannot access. Safe emulation: synthetic identifiers
+  only, in-process requests, no real files, credentials or targets.'
+required_event_types:
+- file.access_denied
+expected_rule_ids:
+- IIDE-PORTAL-001
+replay_count: 5
+emulation: unauthorized_access_probing.py

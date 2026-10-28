@@ -105,6 +105,8 @@ def _worker_main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     sys.path.insert(0, str(Path(args.testbed_dir).resolve()))
+    # Emulations may import a sibling helper (e.g. attacks/emu_common.py).
+    sys.path.insert(1, str(Path(args.emulation).resolve().parent))
     try:
         from app.main import create_app
         from fastapi.testclient import TestClient
