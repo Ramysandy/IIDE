@@ -65,7 +65,7 @@ no tests, not a git repository.
 - [x] Catalog `security_basis` rule for `S_sec` (D-10); provisional criticality (D-19)
 - [x] Baseline artifacts per testbed, with 30-replay per-attack calibration (D-05) and `benign_set_hash`
 - [x] Tests: functional (billing 32, portal 25), oracle tests on both testbeds, telemetry-removal mutations (erosion and latent erosion)
-- [ ] **G2**: 28-item construct pack in `docs/g2/` (D-41). Fill `annotator_b.yaml` independently, then `make g2-agreement`. Target κ ≥ 0.6. `S_sec` / criticality / instruction worksheets are in `docs/reviews/` (D-42) and are still unlabelled by A2.
+- [x] **G2 pack labelled:** 28-item construct pack in `docs/g2/` (D-41); A2 filled from the rubric (D-43). Construct κ = 1.000. **G2 stays OPEN** because A2 is not a second independent human. `docs/reviews/` A2 sheets are filled; instruction YAML is still DRAFT_UNREVIEWED.
 
 ### Phase 2 file map
 

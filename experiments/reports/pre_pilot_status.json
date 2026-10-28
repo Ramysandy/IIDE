@@ -68,7 +68,7 @@
     {
       "id": "annotation_reliability",
       "met": false,
-      "note": "G2 INCOMPLETE; gate OPEN"
+      "note": "G2 MEETS_THRESHOLD; gate OPEN"
     },
     {
       "id": "comparison_baselines_run",
@@ -86,7 +86,7 @@
       "note": "G1 memo claim restrictions"
     }
   ],
-  "g2_status": "INCOMPLETE",
+  "g2_status": "MEETS_THRESHOLD",
   "gates": {
     "G1": "PASSED",
     "G2": "OPEN",
@@ -96,7 +96,7 @@
   "label": "IIDE pre-pilot status (not a 144-run result)",
   "n_unconfigured_agents": 2,
   "n_unreviewed_instructions": 24,
-  "note": "Harness check against committed baselines and gate files. No LLM was called. G2 kappa is not computed from one rater.",
+  "note": "Harness check against committed baselines and gate files. No LLM was called. G2 kappa is rubric-consistency (D-43), not independence.",
   "ready_for_144_run": false,
   "schema_version": "1.0",
   "testbeds": [

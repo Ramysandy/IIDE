@@ -48,6 +48,7 @@ def main(argv: list[str] | None = None) -> int:
         f"- {report.note}",
         "",
         "This script does not set `configs/gates.yaml`.",
+        "Numeric κ>=0.6 is not a G2 pass if B is the same rater or the fixture author.",
         "",
     ]
     (args.output_dir / "g2_agreement.md").write_text("\n".join(md), encoding="utf-8")

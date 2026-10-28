@@ -159,7 +159,7 @@ def build_status() -> PrePilotStatus:
         definition_of_done=done,
         note=(
             "Harness check against committed baselines and gate files. "
-            "No LLM was called. G2 kappa is not computed from one rater."
+            "No LLM was called. G2 kappa is rubric-consistency (D-43), not independence."
         ),
     )
 

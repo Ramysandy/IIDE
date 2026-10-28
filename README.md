@@ -6,14 +6,14 @@ functional tests still pass.
 
 > **Status: Phase 5 harness plus G1 PASSED.** The prior-art sweep is in
 > [`docs/g1_prior_art.md`](docs/g1_prior_art.md) (recommended **GO** for the E1+E2+E3 combination).
-> That memo is not a novelty claim. Gate **G2** is still **OPEN**: 28 construct vignettes are in
-> [`docs/g2/`](docs/g2/); a second independent annotator has not labelled them. Human worksheets for
-> `S_sec`, criticality, and instruction review are in [`docs/reviews/`](docs/reviews/) and are also
-> unlabelled by A2. `make report` writes a pre-pilot status file, not a 144-run result. A G4
-> construct check on scripted patches is in `experiments/reports/g4_calibration.md` and does not set
-> G4 to PASSED. **No LLM has been called and no experimental result exists.** A real 144-run is
-> refused until G2 passes, instructions are REVIEWED, and two agent adapters are configured.
-> Isolation is still process-level.
+> That memo is not a novelty claim. Gate **G2** is still **OPEN**: construct κ = 1.000 on
+> [`docs/g2/`](docs/g2/) is rubric-consistency, not a second independent human (D-43).
+> `S_sec`, criticality, and instruction A2 sheets are in [`docs/reviews/`](docs/reviews/);
+> instruction YAML stays `DRAFT_UNREVIEWED`. `make report` writes a pre-pilot status file, not a
+> 144-run result. A G4 construct check on scripted patches is in
+> `experiments/reports/g4_calibration.md` and does not set G4 to PASSED. **No LLM has been called
+> and no experimental result exists.** A real 144-run is refused until G2 passes, instructions are
+> REVIEWED, and two agent adapters are configured. Isolation is still process-level.
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source

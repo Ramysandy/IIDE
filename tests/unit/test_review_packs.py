@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from typing import Any
 
 import yaml
@@ -42,12 +44,28 @@ def test_review_packs_are_blinded_and_complete():
         assert "criticality" not in item
     b_sec = _load("s_sec", "annotator_b.yaml")
     assert b_sec["blinded"] is True
-    assert all(row["label"] is None for row in b_sec["items"])
+    assert {row["label"] for row in b_sec["items"]} <= {"SECURITY", "NOT_SECURITY"}
+    assert all(row["label"] is not None for row in b_sec["items"])
     b_crit = _load("criticality", "annotator_b.yaml")
-    assert all(row["criticality"] is None for row in b_crit["items"])
+    assert {row["criticality"] for row in b_crit["items"]} <= {1, 2, 3}
     b_ins = _load("instructions", "annotator_b.yaml")
-    assert all(row["difficulty"] is None for row in b_ins["items"])
+    assert {row["difficulty"] for row in b_ins["items"]} <= {1, 2, 3, 4, 5}
+    assert {row["scope_similarity"] for row in b_ins["items"]} <= {"MATCHED", "UNMATCHED"}
     a_sec = _load("s_sec", "annotator_a.yaml")
     assert a_sec["blinded"] is False
     assert {row["label"] for row in a_sec["items"]} <= {"SECURITY", "NOT_SECURITY"}
     assert (REVIEWS / "instructions" / "annotator_a.yaml").is_file() is False
+    for rec in load_instructions(TESTBEDS_DIR / "billing_api").values():
+        if rec.family in exp.families:
+            assert rec.review_status == "DRAFT_UNREVIEWED"
+
+
+def test_export_review_packs_refuses_to_overwrite_completed_b():
+    proc = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "scripts" / "export_review_packs.py")],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+    )
+    assert proc.returncode != 0
+    assert "already has labels" in proc.stderr + proc.stdout

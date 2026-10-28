@@ -14,7 +14,7 @@ def test_pre_pilot_status_is_blocked_and_honest():
     assert status.ready_for_144_run is False
     assert status.gates["G1"] == "PASSED"
     assert status.gates["G2"] == "OPEN"
-    assert status.g2_status == "INCOMPLETE"
+    assert status.g2_status == "MEETS_THRESHOLD"
     assert status.n_unconfigured_agents == 2
     assert status.n_unreviewed_instructions == 24
     assert status.blockers

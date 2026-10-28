@@ -27,7 +27,7 @@ make manifest-pilot                            # write experiments/manifests/pil
 make run-pilot DRY_RUN=1                       # validate the 144-run plan; never calls an agent
 make score-runs                                # list primary attempts under experiments/raw/ (if any)
 make compare-baselines                         # G4 construct check; writes experiments/reports/g4_calibration.{md,json}
-make g2-agreement                              # G2 kappa; exits 2 until docs/g2/annotator_b.yaml is complete; does not set gates.yaml
+make g2-agreement                              # G2 kappa; exits 2 if annotator_b.yaml is incomplete; does not set gates.yaml
 make report                                    # pre-pilot status (spec 16); writes experiments/reports/pre_pilot_status.{md,json}
 make export-reviews                            # blinded A2 worksheets under docs/reviews/; does not fill B or set REVIEWED
 ```
@@ -90,7 +90,7 @@ baseline was recorded. Fixing that requires a new baseline under a new `experime
 - Instructions are DRAFT_UNREVIEWED (D-36). The 144-run has not been executed (D-35).
 - G4 is a construct check on scripted patches (D-38, D-39), not a 144-run result.
 - G1 sweep is in `docs/g1_prior_art.md` (D-40). Recommended GO; operator set G1 PASSED 2026-10-28.
-- G2 construct pack is `docs/g2/` (D-41). Second annotator not done. `S_sec`, criticality, and instruction worksheets are in `docs/reviews/` (D-42) and are still unlabelled by A2 (D-10, D-19, D-36).
+- G2 construct pack is `docs/g2/` (D-41, D-43). A2 is filled; construct κ = 1.000; G2 stays OPEN because A2 is not a second independent human. `S_sec`, criticality, and instruction A2 sheets are in `docs/reviews/`; instruction YAML is still DRAFT_UNREVIEWED.
 - `make report` is a pre-pilot harness check (D-42), not a 144-run result.
 - Phase 1 is reproducible from tag `phase1-baseline`; Phase 2 from `phase2-baseline`; Phase 3 from `phase3-scoring`; Phase 4 from `phase4-harness`; Phase 5 from `phase5-baselines`.
 - Timestamps and event IDs differ between runs by design; detection never depends on them.

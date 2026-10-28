@@ -6,10 +6,10 @@ set `review_status: REVIEWED` on instruction YAML and does **not** set G2 PASSED
 
 | Pack | Question | A1 | A2 |
 |---|---|---|---|
-| [`g2/`](../g2/) | erosion vs generic regression (28 vignettes) | fixture author | pending |
-| [`s_sec/`](s_sec/) | is this event type security-bearing? | catalog (provisional) | pending |
-| [`criticality/`](criticality/) | attack weight 1/2/3 | attack YAML (provisional) | pending |
-| [`instructions/`](instructions/) | difficulty 1–5 and scope similarity | none (author notes are in the stem) | pending |
+| [`g2/`](../g2/) | erosion vs generic regression (28 vignettes) | fixture author | filled; not independent (D-43) |
+| [`s_sec/`](s_sec/) | is this event type security-bearing? | catalog (provisional) | filled; not independent (D-43) |
+| [`criticality/`](criticality/) | attack weight 1/2/3 | attack YAML (provisional) | filled; not independent (D-43) |
+| [`instructions/`](instructions/) | difficulty 1–5 and scope similarity | none (author notes are in the stem) | filled; YAML still DRAFT_UNREVIEWED |
 
 Regenerate worksheets (does not fill B):
 

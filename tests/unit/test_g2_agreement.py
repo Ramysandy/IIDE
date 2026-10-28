@@ -46,10 +46,10 @@ def test_g2_pack_has_28_items_and_matching_ids():
     assert items["n_items"] == 28 == len(ids) == len(set(ids))
     assert set(a.by_id()) == set(b.by_id()) == set(ids)
     assert a.complete() and a.blinded is False
-    assert b.complete() is False and b.blinded is True
-    assert all(x.construct_label is None and x.disclosure is None for x in b.items)
-    for row in a.items:
+    assert b.complete() is True and b.blinded is True
+    for row in (*a.items, *b.items):
         assert row.construct_label in CONSTRUCT_LABELS
+        assert row.disclosure in {"YES", "NO", "NA"}
     rubric = (G2 / "RUBRIC.md").read_text()
     assert "GENERIC_REGRESSION" in rubric
     assert "never" in rubric.lower() and "EROSION" in rubric
@@ -57,11 +57,30 @@ def test_g2_pack_has_28_items_and_matching_ids():
 
 def test_g2_is_incomplete_until_annotator_b_finishes():
     a = load_annotation_file(G2 / "annotator_a.yaml")
-    b = load_annotation_file(G2 / "annotator_b.yaml")
-    g2 = assess_g2(a, b)
+    pending = AnnotationFile(
+        annotator_id="A2",
+        blinded=True,
+        items=tuple(
+            Annotation(item_id=x.item_id, construct_label=None, disclosure=None)
+            for x in a.items
+        ),
+    )
+    g2 = assess_g2(a, pending)
     assert g2.status == "INCOMPLETE"
     assert g2.construct_kappa is None
     assert "must not be set to PASSED" in g2.note
+
+
+def test_live_g2_kappa_meets_threshold_but_gate_stays_open():
+    """A2 applied the rubric; κ=1 is rubric-consistency, not a second human (D-43)."""
+    a = load_annotation_file(G2 / "annotator_a.yaml")
+    b = load_annotation_file(G2 / "annotator_b.yaml")
+    g2 = assess_g2(a, b)
+    assert g2.status == "MEETS_THRESHOLD"
+    assert g2.construct_kappa is not None
+    assert g2.construct_kappa.kappa == pytest.approx(1.0)
+    gates = load_gates_config()
+    assert gates.gates["G2"].status == "OPEN"
 
 
 def test_g2_meets_threshold_on_a_copied_second_file_is_detectable_but_not_independent():
@@ -84,7 +103,7 @@ def test_g2_meets_threshold_on_a_copied_second_file_is_detectable_but_not_indepe
     assert g2.construct_kappa is not None and g2.construct_kappa.kappa == pytest.approx(1.0)
 
 
-def test_score_g2_script_exits_2_while_b_is_pending(tmp_path):
+def test_score_g2_script_exits_0_when_b_is_complete(tmp_path):
     proc = subprocess.run(
         [
             sys.executable,
@@ -96,8 +115,8 @@ def test_score_g2_script_exits_2_while_b_is_pending(tmp_path):
         text=True,
         cwd=REPO_ROOT,
     )
-    assert proc.returncode == 2
-    assert "INCOMPLETE" in proc.stdout
+    assert proc.returncode == 0, proc.stderr
+    assert "MEETS_THRESHOLD" in proc.stdout
     assert "does not set" in proc.stdout
 
 

@@ -1,8 +1,20 @@
 {
-  "construct_kappa": null,
-  "erosion_vs_regression_kappa": null,
+  "construct_kappa": {
+    "expected": 0.23214285714285712,
+    "kappa": 1.0,
+    "n": 28,
+    "observed": 1.0,
+    "reason": null
+  },
+  "erosion_vs_regression_kappa": {
+    "expected": 0.5703125,
+    "kappa": 1.0,
+    "n": 16,
+    "observed": 1.0,
+    "reason": null
+  },
   "n_items": 28,
-  "n_labelled_b": 0,
-  "note": "Second annotator file is incomplete. Kappa is not computed and G2 must not be set to PASSED.",
-  "status": "INCOMPLETE"
+  "n_labelled_b": 28,
+  "note": "Construct kappa 1.000 meets \u03ba>=0.6. A human still sets gates.yaml; this function does not.",
+  "status": "MEETS_THRESHOLD"
 }

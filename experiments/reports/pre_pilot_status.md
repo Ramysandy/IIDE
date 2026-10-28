@@ -1,10 +1,10 @@
 # IIDE pre-pilot status (not a 144-run result)
 
-Harness check against committed baselines and gate files. No LLM was called. G2 kappa is not computed from one rater.
+Harness check against committed baselines and gate files. No LLM was called. G2 kappa is rubric-consistency (D-43), not independence.
 
 - Ready for 144-run: **False**
 - Gates: {'G1': 'PASSED', 'G2': 'OPEN', 'G3': 'NOT_EVALUATED', 'G4': 'NOT_EVALUATED'}
-- G2 pack: **INCOMPLETE**
+- G2 pack: **MEETS_THRESHOLD**
 - Unreviewed instructions: 24
 - Unconfigured agents: 2
 
@@ -37,7 +37,7 @@ Harness check against committed baselines and gate files. No LLM was called. G2 
 | eligible_scoring | True | Phase 3 library; no 144-run scores |
 | metric_undefined_handling | True | section 9 tests |
 | section9_fixture | True | tests/unit/test_scoring_*.py |
-| annotation_reliability | False | G2 INCOMPLETE; gate OPEN |
+| annotation_reliability | False | G2 MEETS_THRESHOLD; gate OPEN |
 | comparison_baselines_run | True | G4 construct check, not a 144-run |
 | pilot_report_144 | False | 144-run not executed; this file is a pre-pilot status report |
 | novelty_claims_bounded | True | G1 memo claim restrictions |

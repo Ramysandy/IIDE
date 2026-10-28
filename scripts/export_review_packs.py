@@ -2,10 +2,12 @@
 """Write blinded second-annotator worksheets for S_sec, criticality, and instructions.
 
 Does not copy A1 labels into B. Does not set review_status=REVIEWED.
+Refuses to overwrite a completed annotator_b.yaml unless --force is passed.
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -36,7 +38,19 @@ def _dump(path: Path, payload: dict) -> None:
     )
 
 
-def export_s_sec() -> None:
+def _b_is_complete(path: Path, value_keys: tuple[str, ...]) -> bool:
+    if not path.is_file():
+        return False
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        return False
+    items = data.get("items") or []
+    if not items:
+        return False
+    return all(all(row.get(k) is not None for k in value_keys) for row in items)
+
+
+def export_s_sec(*, force: bool) -> None:
     items: list[dict] = []
     a_items: list[dict] = []
     b_items: list[dict] = []
@@ -64,6 +78,9 @@ def export_s_sec() -> None:
             )
             b_items.append({"item_id": item_id, "label": None, "note": ""})
     root = REVIEWS / "s_sec"
+    b_path = root / "annotator_b.yaml"
+    if _b_is_complete(b_path, ("label",)) and not force:
+        raise SystemExit(f"{b_path} already has labels; pass --force to overwrite")
     _dump(root / "items.yaml", {"schema_version": "1.0", "pack_id": "s_sec-v1", "items": items})
     _dump(
         root / "annotator_a.yaml",
@@ -87,7 +104,7 @@ def export_s_sec() -> None:
     )
 
 
-def export_criticality() -> None:
+def export_criticality(*, force: bool) -> None:
     items: list[dict] = []
     a_items: list[dict] = []
     b_items: list[dict] = []
@@ -115,6 +132,9 @@ def export_criticality() -> None:
             )
             b_items.append({"item_id": item_id, "criticality": None, "note": ""})
     root = REVIEWS / "criticality"
+    b_path = root / "annotator_b.yaml"
+    if _b_is_complete(b_path, ("criticality",)) and not force:
+        raise SystemExit(f"{b_path} already has labels; pass --force to overwrite")
     _dump(
         root / "items.yaml",
         {"schema_version": "1.0", "pack_id": "criticality-v1", "items": items},
@@ -141,7 +161,7 @@ def export_criticality() -> None:
     )
 
 
-def export_instructions() -> None:
+def export_instructions(*, force: bool) -> None:
     exp = load_experiment_config()
     items: list[dict] = []
     b_items: list[dict] = []
@@ -173,6 +193,9 @@ def export_instructions() -> None:
                 }
             )
     root = REVIEWS / "instructions"
+    b_path = root / "annotator_b.yaml"
+    if _b_is_complete(b_path, ("difficulty", "scope_similarity")) and not force:
+        raise SystemExit(f"{b_path} already has labels; pass --force to overwrite")
     _dump(
         root / "items.yaml",
         {"schema_version": "1.0", "pack_id": "instructions-v1", "items": items},
@@ -189,10 +212,17 @@ def export_instructions() -> None:
     )
 
 
-def main() -> int:
-    export_s_sec()
-    export_criticality()
-    export_instructions()
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="overwrite completed annotator_b.yaml files (destroys A2 labels)",
+    )
+    args = parser.parse_args(argv)
+    export_s_sec(force=args.force)
+    export_criticality(force=args.force)
+    export_instructions(force=args.force)
     print(f"wrote review packs under {REVIEWS}")
     return 0
 

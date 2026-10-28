@@ -1,71 +1,71 @@
-schema_version: '1.0'
+schema_version: "1.0"
 annotator_id: A2
 blinded: true
 pack_id: s_sec-v1
 items:
-- item_id: billing_api/api.rate_limit_triggered
-  label: null
-  note: ''
-- item_id: billing_api/audit.permission_change
-  label: null
-  note: ''
-- item_id: billing_api/auth.lockout
-  label: null
-  note: ''
-- item_id: billing_api/auth.login_failed
-  label: null
-  note: ''
-- item_id: billing_api/auth.login_success
-  label: null
-  note: ''
-- item_id: billing_api/auth.role_changed
-  label: null
-  note: ''
-- item_id: billing_api/auth.session_rejected
-  label: null
-  note: ''
-- item_id: billing_api/billing.bulk_export
-  label: null
-  note: ''
-- item_id: billing_api/billing.invoice_read
-  label: null
-  note: ''
-- item_id: billing_api/service.validation_error
-  label: null
-  note: ''
-- item_id: billing_api/webhook.configuration_changed
-  label: null
-  note: ''
-- item_id: billing_api/webhook.delivery_failed
-  label: null
-  note: ''
-- item_id: file_portal/approval.completed
-  label: null
-  note: ''
-- item_id: file_portal/approval.requested
-  label: null
-  note: ''
-- item_id: file_portal/audit.sharing_changed
-  label: null
-  note: ''
-- item_id: file_portal/file.access_denied
-  label: null
-  note: ''
-- item_id: file_portal/file.bulk_export
-  label: null
-  note: ''
-- item_id: file_portal/file.read
-  label: null
-  note: ''
-- item_id: file_portal/file.uploaded
-  label: null
-  note: ''
-- item_id: file_portal/service.validation_error
-  label: null
-  note: ''
-- item_id: file_portal/webhook.notification_failed
-  label: null
-  note: ''
-- item_id: file_portal/webhook.notification_sent
-  label: null
-  note: ''
+  - item_id: billing_api/api.rate_limit_triggered
+    label: SECURITY
+    note: "Frozen rule consumes it; rate-limit audit category."
+  - item_id: billing_api/audit.permission_change
+    label: SECURITY
+    note: "Frozen rule; permission-change audit category."
+  - item_id: billing_api/auth.lockout
+    label: SECURITY
+    note: "Frozen rule; auth-failure evidence."
+  - item_id: billing_api/auth.login_failed
+    label: SECURITY
+    note: "Frozen rule; auth-failure evidence."
+  - item_id: billing_api/auth.login_success
+    label: NOT_SECURITY
+    note: "No frozen rule; success is not an audit category in the rubric."
+  - item_id: billing_api/auth.role_changed
+    label: SECURITY
+    note: "Frozen rule; permission change."
+  - item_id: billing_api/auth.session_rejected
+    label: SECURITY
+    note: "Frozen rule; denied access."
+  - item_id: billing_api/billing.bulk_export
+    label: SECURITY
+    note: "Frozen rule; bulk export."
+  - item_id: billing_api/billing.invoice_read
+    label: SECURITY
+    note: "Frozen rule."
+  - item_id: billing_api/service.validation_error
+    label: NOT_SECURITY
+    note: "No frozen rule; validation is not a listed audit category."
+  - item_id: billing_api/webhook.configuration_changed
+    label: SECURITY
+    note: "Frozen rule; webhook/config change."
+  - item_id: billing_api/webhook.delivery_failed
+    label: SECURITY
+    note: "No frozen rule, but webhook delivery failure is audit evidence of lost security notifications."
+  - item_id: file_portal/approval.completed
+    label: SECURITY
+    note: "Frozen rule; permission/approval change."
+  - item_id: file_portal/approval.requested
+    label: SECURITY
+    note: "Frozen rule."
+  - item_id: file_portal/audit.sharing_changed
+    label: SECURITY
+    note: "Frozen rule; sharing change."
+  - item_id: file_portal/file.access_denied
+    label: SECURITY
+    note: "Frozen rule; denied access."
+  - item_id: file_portal/file.bulk_export
+    label: SECURITY
+    note: "Frozen rule; bulk export."
+  - item_id: file_portal/file.read
+    label: SECURITY
+    note: "Frozen rule."
+  - item_id: file_portal/file.uploaded
+    label: NOT_SECURITY
+    note: "No frozen rule; upload is not a listed audit category."
+  - item_id: file_portal/service.validation_error
+    label: SECURITY
+    note: "Frozen rule consumes it."
+  - item_id: file_portal/webhook.notification_failed
+    label: SECURITY
+    note: "Frozen rule; webhook delivery failure."
+  - item_id: file_portal/webhook.notification_sent
+    label: SECURITY
+    note: "Frozen rule; sharing/webhook evidence."

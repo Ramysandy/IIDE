@@ -58,7 +58,7 @@ score-runs:
 compare-baselines:
 	$(PY) scripts/compare_baselines.py
 
-# G2 kappa on docs/g2 annotator files. Exits 2 until annotator_b.yaml is complete. Does not set gates.yaml.
+# G2 kappa on docs/g2 annotator files. Exits 2 if annotator_b.yaml is incomplete. Does not set gates.yaml.
 g2-agreement:
 	$(PY) scripts/score_g2.py
 

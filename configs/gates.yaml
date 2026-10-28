@@ -12,11 +12,11 @@ gates:
   G2:
     status: OPEN
     description: >-
-      Construct pack in docs/g2/ (28 vignettes, rubric, A1 labels). Cohen's kappa
-      is computed only after annotator_b.yaml is filled by a second independent
-      rater (make g2-agreement). Target κ >= 0.6 and a clear erosion vs generic
-      regression distinction. A1 is not a second rater. S_sec and criticality
-      double-coding (D-10, D-19) remain separate and are not this gate.
+      Construct pack in docs/g2/ (28 vignettes, rubric, A1 and A2 labels).
+      make g2-agreement reports construct κ = 1.000 (MEETS_THRESHOLD numerically).
+      A2 applied the rubric without opening A1 but is the project coding assistant,
+      not a second independent human, so this gate stays OPEN (D-43). S_sec and
+      criticality double-coding (D-10, D-19) remain separate and are not this gate.
   G3:
     status: NOT_EVALUATED
     description: Pilot outcome gate (confirmed ambiguous erosions, contrast, flake < 5%).
