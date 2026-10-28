@@ -1,0 +1,71 @@
+schema_version: '1.0'
+annotator_id: A1
+blinded: false
+pack_id: s_sec-v1
+items:
+- item_id: billing_api/api.rate_limit_triggered
+  label: SECURITY
+  note: Repeated limit hits show sustained abuse of a throttled endpoint.
+- item_id: billing_api/audit.permission_change
+  label: SECURITY
+  note: Independent audit-trail evidence of the same escalation (redundant with auth.role_changed).
+- item_id: billing_api/auth.lockout
+  label: SECURITY
+  note: Corroborating evidence that the threshold was crossed; absent in benign traffic below the threshold.
+- item_id: billing_api/auth.login_failed
+  label: SECURITY
+  note: Direct evidence of repeated failed authentication; the brute-force rule thresholds on its per-account count.
+- item_id: billing_api/auth.login_success
+  label: NOT_SECURITY
+  note: Context only. No frozen rule depends on it and it is not in an audit category.
+- item_id: billing_api/auth.role_changed
+  label: SECURITY
+  note: A grant of the admin role is a privilege escalation signal.
+- item_id: billing_api/auth.session_rejected
+  label: SECURITY
+  note: Session reuse from a different client (reason=client_mismatch) is the token-replay signal.
+- item_id: billing_api/billing.bulk_export
+  label: SECURITY
+  note: Large export volume in one request is the primary bulk-collection signal.
+- item_id: billing_api/billing.invoice_read
+  label: SECURITY
+  note: High read volume by one client precedes bulk collection.
+- item_id: billing_api/service.validation_error
+  label: NOT_SECURITY
+  note: Not in a D-10 audit category and no Phase 2 billing rule depends on it.
+- item_id: billing_api/webhook.configuration_changed
+  label: SECURITY
+  note: Redirecting notifications to an external target can leak or suppress alerts.
+- item_id: billing_api/webhook.delivery_failed
+  label: SECURITY
+  note: Failed delivery means security notifications may be silently lost. No Phase 2 rule consumes it.
+- item_id: file_portal/approval.completed
+  label: SECURITY
+  note: self_approved=true shows the requester decided their own request.
+- item_id: file_portal/approval.requested
+  label: SECURITY
+  note: Needed to correlate a decision with its original requester.
+- item_id: file_portal/audit.sharing_changed
+  label: SECURITY
+  note: A change to public visibility exposes the file to everyone.
+- item_id: file_portal/file.access_denied
+  label: SECURITY
+  note: Repeated denials by one actor indicate probing for accessible files.
+- item_id: file_portal/file.bulk_export
+  label: SECURITY
+  note: Large export volume in one request is the primary bulk-collection signal.
+- item_id: file_portal/file.read
+  label: SECURITY
+  note: High read volume by one actor precedes bulk collection.
+- item_id: file_portal/file.uploaded
+  label: NOT_SECURITY
+  note: Context only. No frozen rule depends on it and it is not in a D-10 audit category.
+- item_id: file_portal/service.validation_error
+  label: SECURITY
+  note: Repeated malformed requests by one actor indicate input probing.
+- item_id: file_portal/webhook.notification_failed
+  label: SECURITY
+  note: Repeated failures to one target mean security notifications are being lost.
+- item_id: file_portal/webhook.notification_sent
+  label: SECURITY
+  note: Independent evidence that a public-sharing change was announced (redundant with audit.sharing_changed).

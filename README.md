@@ -7,10 +7,13 @@ functional tests still pass.
 > **Status: Phase 5 harness plus G1 PASSED.** The prior-art sweep is in
 > [`docs/g1_prior_art.md`](docs/g1_prior_art.md) (recommended **GO** for the E1+E2+E3 combination).
 > That memo is not a novelty claim. Gate **G2** is still **OPEN**: 28 construct vignettes are in
-> [`docs/g2/`](docs/g2/); a second independent annotator has not labelled them. A G4 construct check
-> on scripted patches is in `experiments/reports/g4_calibration.md` and does not set G4 to PASSED.
-> **No LLM has been called and no experimental result exists.** A real 144-run is refused until G2
-> passes and two agent adapters are configured. Isolation is still process-level.
+> [`docs/g2/`](docs/g2/); a second independent annotator has not labelled them. Human worksheets for
+> `S_sec`, criticality, and instruction review are in [`docs/reviews/`](docs/reviews/) and are also
+> unlabelled by A2. `make report` writes a pre-pilot status file, not a 144-run result. A G4
+> construct check on scripted patches is in `experiments/reports/g4_calibration.md` and does not set
+> G4 to PASSED. **No LLM has been called and no experimental result exists.** A real 144-run is
+> refused until G2 passes, instructions are REVIEWED, and two agent adapters are configured.
+> Isolation is still process-level.
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source
@@ -31,6 +34,7 @@ make score TESTBED=billing_api   # baseline self-comparison report (a harness ch
 make run-pilot DRY_RUN=1         # validate the 144-run manifest; never calls an agent
 make compare-baselines           # G4 construct check on scripted patches; never calls an LLM
 make g2-agreement                # G2 kappa; exits 2 until annotator_b.yaml is filled
+make report                      # pre-pilot status; exit 1 only on frozen-hash drift
 ```
 
 ## Layout (Phase 5)
@@ -46,9 +50,10 @@ iide/scoring/                  metrics (spec 7, 13)
 iide/analysis/                 Phase 3 reports + Phase 5 comparison methods
 experiments/manifests/         144-run plan (JSONL)
 experiments/raw/               per-run artifacts (gitignored)
-experiments/reports/           G4 calibration (construct check, not a 144-run result)
+experiments/reports/           G4 calibration + pre-pilot status (not 144-run results)
 docs/g2/                       G2 construct pack (rubric, 28 vignettes, A1 labels; A2 pending)
-scripts/                       run_baseline.py, run_pilot.py, score_replays.py, score_runs.py, compare_baselines.py, score_g2.py
+docs/reviews/                  S_sec, criticality, instruction worksheets (A2 pending)
+scripts/                       run_baseline.py, run_pilot.py, score_replays.py, score_runs.py, compare_baselines.py, score_g2.py, verify_reproducibility.py, export_review_packs.py
 configs/llm_reviewer.yaml      frozen LLM-diff prompt; command unset → UNAVAILABLE
 ```
 

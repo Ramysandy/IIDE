@@ -1,0 +1,193 @@
+schema_version: '1.0'
+pack_id: s_sec-v1
+items:
+- id: billing_api/api.rate_limit_triggered
+  testbed_id: billing_api
+  event_type: api.rate_limit_triggered
+  description: A client exceeded the export rate limit
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-008
+  required_by_attacks:
+  - rate_limit_abuse
+- id: billing_api/audit.permission_change
+  testbed_id: billing_api
+  event_type: audit.permission_change
+  description: Audit record of a permission change
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-003
+  required_by_attacks:
+  - role_escalation
+- id: billing_api/auth.lockout
+  testbed_id: billing_api
+  event_type: auth.lockout
+  description: An account was locked after reaching the failed-login threshold
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-001
+  required_by_attacks:
+  - credential_bruteforce
+- id: billing_api/auth.login_failed
+  testbed_id: billing_api
+  event_type: auth.login_failed
+  description: A login attempt failed (bad credentials, or attempt against a locked account)
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-001
+  required_by_attacks:
+  - credential_bruteforce
+- id: billing_api/auth.login_success
+  testbed_id: billing_api
+  event_type: auth.login_success
+  description: A login attempt succeeded
+  owning_module: app.service.BillingService
+  required_by_rules: []
+  required_by_attacks: []
+- id: billing_api/auth.role_changed
+  testbed_id: billing_api
+  event_type: auth.role_changed
+  description: An account's role was changed
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-002
+  required_by_attacks:
+  - role_escalation
+- id: billing_api/auth.session_rejected
+  testbed_id: billing_api
+  event_type: auth.session_rejected
+  description: A request was rejected because its session was unknown, used from another client, or lacked the role
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-004
+  required_by_attacks:
+  - token_replay
+- id: billing_api/billing.bulk_export
+  testbed_id: billing_api
+  event_type: billing.bulk_export
+  description: A batch of synthetic invoices was exported
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-005
+  required_by_attacks:
+  - bulk_invoice_export
+- id: billing_api/billing.invoice_read
+  testbed_id: billing_api
+  event_type: billing.invoice_read
+  description: A synthetic invoice was read
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-006
+  required_by_attacks:
+  - bulk_invoice_export
+- id: billing_api/service.validation_error
+  testbed_id: billing_api
+  event_type: service.validation_error
+  description: A request failed input validation
+  owning_module: app.main
+  required_by_rules: []
+  required_by_attacks: []
+- id: billing_api/webhook.configuration_changed
+  testbed_id: billing_api
+  event_type: webhook.configuration_changed
+  description: The notification webhook target was changed
+  owning_module: app.service.BillingService
+  required_by_rules:
+  - IIDE-BILLING-007
+  required_by_attacks:
+  - webhook_tampering
+- id: billing_api/webhook.delivery_failed
+  testbed_id: billing_api
+  event_type: webhook.delivery_failed
+  description: A webhook notification could not be delivered
+  owning_module: app.service.BillingService
+  required_by_rules: []
+  required_by_attacks: []
+- id: file_portal/approval.completed
+  testbed_id: file_portal
+  event_type: approval.completed
+  description: An access request was approved or rejected
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-006
+  required_by_attacks:
+  - approval_self_approval
+- id: file_portal/approval.requested
+  testbed_id: file_portal
+  event_type: approval.requested
+  description: Access to a file was requested
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-006
+  required_by_attacks:
+  - approval_self_approval
+- id: file_portal/audit.sharing_changed
+  testbed_id: file_portal
+  event_type: audit.sharing_changed
+  description: The visibility of a file was changed
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-004
+  required_by_attacks:
+  - public_sharing_exposure
+- id: file_portal/file.access_denied
+  testbed_id: file_portal
+  event_type: file.access_denied
+  description: An operation on a file, approval or webhook was denied
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-001
+  required_by_attacks:
+  - unauthorized_access_probing
+- id: file_portal/file.bulk_export
+  testbed_id: file_portal
+  event_type: file.bulk_export
+  description: A batch of files was exported
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-002
+  required_by_attacks:
+  - bulk_file_export
+- id: file_portal/file.read
+  testbed_id: file_portal
+  event_type: file.read
+  description: A file was read by an authorized actor
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-003
+  required_by_attacks:
+  - bulk_file_export
+- id: file_portal/file.uploaded
+  testbed_id: file_portal
+  event_type: file.uploaded
+  description: A synthetic file was uploaded
+  owning_module: app.service.PortalService
+  required_by_rules: []
+  required_by_attacks: []
+- id: file_portal/service.validation_error
+  testbed_id: file_portal
+  event_type: service.validation_error
+  description: A request failed input validation
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-008
+  required_by_attacks:
+  - validation_error_probing
+- id: file_portal/webhook.notification_failed
+  testbed_id: file_portal
+  event_type: webhook.notification_failed
+  description: A security notification could not be delivered
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-007
+  required_by_attacks:
+  - notification_suppression
+- id: file_portal/webhook.notification_sent
+  testbed_id: file_portal
+  event_type: webhook.notification_sent
+  description: A security notification was delivered to the webhook
+  owning_module: app.service.PortalService
+  required_by_rules:
+  - IIDE-PORTAL-005
+  required_by_attacks:
+  - public_sharing_exposure

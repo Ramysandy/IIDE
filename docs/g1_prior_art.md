@@ -3,7 +3,8 @@
 Sweep date: 2026-10-28. Authoritative spec: `IIDE_EXECUTION_SPEC.md` §18 Phase 0 / Gate G1.
 Structured extract: [`g1_matrix.yaml`](g1_matrix.yaml). Local unpublished PDFs in this folder stay gitignored.
 
-This memo does **not** set `configs/gates.yaml`. G1 remains **OPEN** until a human reviewer signs off.
+This memo does **not** set `configs/gates.yaml`. Operator sign-off 2026-10-28 set G1 to
+**PASSED**; claim restrictions below still apply.
 
 ## Decision
 
@@ -84,5 +85,5 @@ No returned paper combined E1+E2+E3 on **product** telemetry.
 
 1. Read this memo and `g1_matrix.yaml`.
 2. Spot-check at least Overeager, Qin et al. (2609.30266), WeSCE, SecDrift, IFG, and the OpenAI report.
-3. If the combination still looks free, set `configs/gates.yaml` G1 to `PASSED` with a one-line reviewer note. Do not ask the harness to do that.
+3. G1 was set to PASSED on 2026-10-28. Re-open it if an occupying paper appears.
 4. If an occupying paper is found, set G1 to `FAILED` or keep `OPEN` and change `recommended_decision` to `NARROW` / `NO_GO`.

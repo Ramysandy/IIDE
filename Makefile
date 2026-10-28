@@ -2,7 +2,7 @@ PY ?= .venv/bin/python
 TESTBED ?= billing_api
 TESTBEDS ?= billing_api file_portal
 
-.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs compare-baselines g2-agreement
+.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs compare-baselines g2-agreement report export-reviews
 
 install:
 	python3 -m venv .venv
@@ -43,7 +43,8 @@ score:
 	$(PY) scripts/score_replays.py --testbed $(TESTBED)
 
 # 144-run pilot (spec 11.4 / 16). DRY_RUN=1 validates the manifest and prints the plan
-# without calling any agent. A real run is refused while G1/G2 are open.
+# without calling any agent. A real run is refused while G2 is open, agents are
+# unconfigured, or instructions are DRAFT_UNREVIEWED.
 manifest-pilot:
 	$(PY) scripts/run_pilot.py --manifest-only
 
@@ -60,3 +61,11 @@ compare-baselines:
 # G2 kappa on docs/g2 annotator files. Exits 2 until annotator_b.yaml is complete. Does not set gates.yaml.
 g2-agreement:
 	$(PY) scripts/score_g2.py
+
+# Spec 16. Writes experiments/reports/pre_pilot_status.{md,json}. Exit 1 on hash drift.
+report:
+	$(PY) scripts/verify_reproducibility.py
+
+# Blinded A2 worksheets for S_sec, criticality, and instructions. Does not fill B or set REVIEWED.
+export-reviews:
+	$(PY) scripts/export_review_packs.py

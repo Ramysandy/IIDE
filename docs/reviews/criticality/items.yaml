@@ -1,0 +1,105 @@
+schema_version: '1.0'
+pack_id: criticality-v1
+items:
+- id: billing_api/bulk_invoice_export
+  testbed_id: billing_api
+  attack_id: bulk_invoice_export
+  description: 'An analyst session reads eight synthetic invoices and exports twelve in one request. Safe emulation: synthetic identifiers only, in-process requests, no real credentials or targets.'
+  technique_id: T1213
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - billing.bulk_export
+  - billing.invoice_read
+- id: billing_api/credential_bruteforce
+  testbed_id: billing_api
+  attack_id: credential_bruteforce
+  description: 'Six wrong guesses against one synthetic account; the fifth crosses the lockout threshold. Safe emulation: synthetic identifiers only, in-process requests, no real credentials or targets.'
+  technique_id: T1110
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - auth.login_failed
+  - auth.lockout
+- id: billing_api/rate_limit_abuse
+  testbed_id: billing_api
+  attack_id: rate_limit_abuse
+  description: 'One client calls the throttled export endpoint six times; three calls hit the limit. Safe emulation: synthetic identifiers only, in-process requests, no real credentials or targets.'
+  technique_id: UNMAPPED
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - api.rate_limit_triggered
+- id: billing_api/role_escalation
+  testbed_id: billing_api
+  attack_id: role_escalation
+  description: 'A synthetic admin session grants the admin role to a viewer account. Safe emulation: synthetic identifiers only, in-process requests, no real credentials or targets.'
+  technique_id: T1098
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - auth.role_changed
+  - audit.permission_change
+- id: billing_api/token_replay
+  testbed_id: billing_api
+  attack_id: token_replay
+  description: 'A victim''s synthetic session identifier is presented four times from a different client. Safe emulation: synthetic identifiers only, in-process requests, no real credentials or targets.'
+  technique_id: T1550
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - auth.session_rejected
+- id: billing_api/webhook_tampering
+  testbed_id: billing_api
+  attack_id: webhook_tampering
+  description: 'An admin session redirects the notification webhook to an external synthetic target. Safe emulation: synthetic identifiers only, in-process requests, no real credentials or targets.'
+  technique_id: UNMAPPED
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - webhook.configuration_changed
+- id: file_portal/approval_self_approval
+  testbed_id: file_portal
+  attack_id: approval_self_approval
+  description: 'An admin requests access to a file and approves their own request. Safe emulation: synthetic identifiers only, in-process requests, no real files, credentials or targets.'
+  technique_id: UNMAPPED
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - approval.requested
+  - approval.completed
+- id: file_portal/bulk_file_export
+  testbed_id: file_portal
+  attack_id: bulk_file_export
+  description: 'A reader reads eight shared files and exports twelve in one request. Safe emulation: synthetic identifiers only, in-process requests, no real files, credentials or targets.'
+  technique_id: T1213
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - file.bulk_export
+  - file.read
+- id: file_portal/notification_suppression
+  testbed_id: file_portal
+  attack_id: notification_suppression
+  description: 'The webhook is pointed at an unreachable target, then three sharing changes fail to notify. Safe emulation: synthetic identifiers only, in-process requests, no real files, credentials or targets.'
+  technique_id: T1562
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - webhook.notification_failed
+- id: file_portal/public_sharing_exposure
+  testbed_id: file_portal
+  attack_id: public_sharing_exposure
+  description: 'An owner makes a private file public. Safe emulation: synthetic identifiers only, in-process requests, no real files, credentials or targets.'
+  technique_id: UNMAPPED
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - audit.sharing_changed
+  - webhook.notification_sent
+- id: file_portal/unauthorized_access_probing
+  testbed_id: file_portal
+  attack_id: unauthorized_access_probing
+  description: 'An outsider tries to read six files it cannot access. Safe emulation: synthetic identifiers only, in-process requests, no real files, credentials or targets.'
+  technique_id: UNMAPPED
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - file.access_denied
+- id: file_portal/validation_error_probing
+  testbed_id: file_portal
+  attack_id: validation_error_probing
+  description: 'One actor sends six malformed upload requests. Safe emulation: synthetic identifiers only, in-process requests, no real files, credentials or targets.'
+  technique_id: UNMAPPED
+  technique_mapping_status: UNVERIFIED
+  required_event_types:
+  - service.validation_error

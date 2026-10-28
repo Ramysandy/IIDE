@@ -1,0 +1,126 @@
+{
+  "blockers": [
+    "required gates still open: ['G2'] (pass --allow-open-gates with a reason to override)",
+    "unconfigured agents: ['pilot_agent_a', 'pilot_agent_b']",
+    "24 instruction(s) still DRAFT_UNREVIEWED (spec 10: review difficulty before execution)"
+  ],
+  "definition_of_done": [
+    {
+      "id": "g1_documented",
+      "met": true,
+      "note": "D-40"
+    },
+    {
+      "id": "two_testbeds",
+      "met": true,
+      "note": "billing_api and file_portal"
+    },
+    {
+      "id": "functional_suites_at_baseline",
+      "met": true,
+      "note": "from committed baseline_coverage.json"
+    },
+    {
+      "id": "attacks_baseline_validated",
+      "met": true,
+      "note": "A0 equals the attack set; hashes match"
+    },
+    {
+      "id": "flake_under_limit",
+      "met": true,
+      "note": "per-attack, D-05"
+    },
+    {
+      "id": "baseline_artifacts_committed",
+      "met": true,
+      "note": "spec 6.1"
+    },
+    {
+      "id": "instruction_triples",
+      "met": true,
+      "note": "8 matched groups \u00d7 3 variants; 24 still DRAFT_UNREVIEWED"
+    },
+    {
+      "id": "workspace_isolation",
+      "met": true,
+      "note": "allowlist; process-level only (D-03)"
+    },
+    {
+      "id": "manifest_and_records",
+      "met": true,
+      "note": "144-row manifest; run_record schema"
+    },
+    {
+      "id": "eligible_scoring",
+      "met": true,
+      "note": "Phase 3 library; no 144-run scores"
+    },
+    {
+      "id": "metric_undefined_handling",
+      "met": true,
+      "note": "section 9 tests"
+    },
+    {
+      "id": "section9_fixture",
+      "met": true,
+      "note": "tests/unit/test_scoring_*.py"
+    },
+    {
+      "id": "annotation_reliability",
+      "met": false,
+      "note": "G2 INCOMPLETE; gate OPEN"
+    },
+    {
+      "id": "comparison_baselines_run",
+      "met": true,
+      "note": "G4 construct check, not a 144-run"
+    },
+    {
+      "id": "pilot_report_144",
+      "met": false,
+      "note": "144-run not executed; this file is a pre-pilot status report"
+    },
+    {
+      "id": "novelty_claims_bounded",
+      "met": true,
+      "note": "G1 memo claim restrictions"
+    }
+  ],
+  "g2_status": "INCOMPLETE",
+  "gates": {
+    "G1": "PASSED",
+    "G2": "OPEN",
+    "G3": "NOT_EVALUATED",
+    "G4": "NOT_EVALUATED"
+  },
+  "label": "IIDE pre-pilot status (not a 144-run result)",
+  "n_unconfigured_agents": 2,
+  "n_unreviewed_instructions": 24,
+  "note": "Harness check against committed baselines and gate files. No LLM was called. G2 kappa is not computed from one rater.",
+  "ready_for_144_run": false,
+  "schema_version": "1.0",
+  "testbeds": [
+    {
+      "exit_criterion_met": true,
+      "flake_limit": 0.05,
+      "functional_tests_passed": true,
+      "hashes_match": true,
+      "max_flake_rate": 0.0,
+      "n_a0": 6,
+      "n_attacks": 6,
+      "n_event_types": 12,
+      "testbed_id": "billing_api"
+    },
+    {
+      "exit_criterion_met": true,
+      "flake_limit": 0.05,
+      "functional_tests_passed": true,
+      "hashes_match": true,
+      "max_flake_rate": 0.0,
+      "n_a0": 6,
+      "n_attacks": 6,
+      "n_event_types": 10,
+      "testbed_id": "file_portal"
+    }
+  ]
+}

@@ -65,8 +65,7 @@ no tests, not a git repository.
 - [x] Catalog `security_basis` rule for `S_sec` (D-10); provisional criticality (D-19)
 - [x] Baseline artifacts per testbed, with 30-replay per-attack calibration (D-05) and `benign_set_hash`
 - [x] Tests: functional (billing 32, portal 25), oracle tests on both testbeds, telemetry-removal mutations (erosion and latent erosion)
-- [ ] **G2**: 28-item construct pack in `docs/g2/` (D-41). Fill `annotator_b.yaml` independently, then `make g2-agreement`. Target κ ≥ 0.6. `S_sec` / criticality double-coding (D-10, D-19) is still separate and provisional.
-- [ ] Prior-art review (G1) still open
+- [ ] **G2**: 28-item construct pack in `docs/g2/` (D-41). Fill `annotator_b.yaml` independently, then `make g2-agreement`. Target κ ≥ 0.6. `S_sec` / criticality / instruction worksheets are in `docs/reviews/` (D-42) and are still unlabelled by A2.
 
 ### Phase 2 file map
 
@@ -123,6 +122,8 @@ no tests, not a git repository.
 - [x] IFG-style monitor: `UNAVAILABLE` (not fair/reproducible in this budget)
 - [x] Confusion vs replay-oracle `y` on four scripted patches; report at `experiments/reports/g4_calibration.{md,json}`
 - [x] `filter_lockout` verified as confirmed oracle erosion with tests still passing
+- [x] `make report` / `scripts/verify_reproducibility.py` pre-pilot status (D-42); not a 144-run result
+- [x] Blinded review packs in `docs/reviews/` for `S_sec`, criticality, and instructions (A2 pending)
 - [ ] **G4 on the 144-run:** blocked (G2 open, agents unconfigured, 144-run not executed). `gates.yaml` G4 is `NOT_EVALUATED`.
 
 ### Phase 5 file map
@@ -134,7 +135,9 @@ no tests, not a git repository.
 | LLM prompt (unconfigured) | `configs/llm_reviewer.yaml` |
 | CLI | `scripts/compare_baselines.py`; `make compare-baselines` |
 | Report | `experiments/reports/g4_calibration.{md,json}` |
-| Tests | `tests/unit/test_comparison_baselines.py`, `tests/integration/test_g4_calibration.py` |
+| Pre-pilot status | `iide/analysis/status.py`, `scripts/verify_reproducibility.py`; `make report` |
+| Human review packs | `docs/reviews/{s_sec,criticality,instructions}/`, `scripts/export_review_packs.py` |
+| Tests | `tests/unit/test_comparison_baselines.py`, `tests/integration/test_g4_calibration.py`, `tests/unit/test_pre_pilot_status.py`, `tests/unit/test_review_packs.py` |
 
 ## Dependencies between phases
 
@@ -156,7 +159,7 @@ no tests, not a git repository.
 | Process isolation is weaker than containers (no network block) | Documented in D-03/D-31; workspace has no oracle artifacts; Docker daemon is not running; upgrade before untrusted-agent runs |
 | Agents may change telemetry transport (e.g. library migration F5) | Harness contract is `create_app(sink=...)` plus `Telemetry.emit`; F5 is out of the Phase 4 family set (D-32) until D-03a is resolved |
 | Flake-rate definition is not given by the spec | Interpretation chosen and tested (D-05); confirm before G3 |
-| Security-bearing labels and criticality are provisional | Second reviewer sign-off (G2) before any agent run (D-10, D-19) |
+| Security-bearing labels and criticality are provisional | Worksheets in `docs/reviews/` (D-42); A2 still pending (D-10, D-19). G2 construct labels are a separate pack. |
 | ATT&CK mapping is unverified (some attacks `UNMAPPED`) | Marked in each attack definition; validate before publication |
-| Novelty gap unverified | Sweep recorded (D-40); recommended GO; G1 stays OPEN until a human sets PASSED; no novelty claim is made |
+| Novelty gap unverified | Sweep recorded (D-40); recommended GO; G1 PASSED 2026-10-28; no novelty claim is made |
 | G4 construct check ≠ G4 on the experiment | Calibration report is `PROVISIONAL`; `gates.yaml` G4 stays `NOT_EVALUATED` until a real 144-run exists (D-39) |
