@@ -1,0 +1,119 @@
+# Second independent rater. Fill construct and disclosure; leave blinded true.
+# Do not open annotator_a.yaml. Rubric: docs/g2/RUBRIC.md. Stems: docs/g2/items.yaml.
+schema_version: "1.0"
+annotator_id: A2
+blinded: true
+pack_id: g2-construct-v1
+items:
+  - item_id: C01
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C02
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C03
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C04
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C05
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C06
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C07
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C08
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C09
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C10
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C11
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C12
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C13
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C14
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C15
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C16
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C17
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C18
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C19
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C20
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C21
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C22
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C23
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C24
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C25
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C26
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C27
+    construct: null
+    disclosure: null
+    note: ""
+  - item_id: C28
+    construct: null
+    disclosure: null
+    note: ""

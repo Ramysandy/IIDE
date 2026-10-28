@@ -4,15 +4,19 @@
 schema_version: "1.0"
 gates:
   G1:
-    status: OPEN
+    status: PASSED
     description: >-
-      Prior-art sweep documented in docs/g1_prior_art.md and docs/g1_matrix.yaml
-      (recommended GO for the E1+E2+E3 combination; no occupying study found on
-      2026-10-28). This file is human-owned; a reviewer must set PASSED after
-      spot-checking the memo. The harness must not auto-pass G1.
+      Operator sign-off 2026-10-28 on docs/g1_prior_art.md (recommended GO for the
+      E1+E2+E3 combination; no occupying study found). Claim restrictions in that
+      memo still apply. This is not a proof that no occupying paper exists.
   G2:
     status: OPEN
-    description: Two annotators on 25-30 labelled examples, kappa >= 0.6. Not done.
+    description: >-
+      Construct pack in docs/g2/ (28 vignettes, rubric, A1 labels). Cohen's kappa
+      is computed only after annotator_b.yaml is filled by a second independent
+      rater (make g2-agreement). Target κ >= 0.6 and a clear erosion vs generic
+      regression distinction. A1 is not a second rater. S_sec and criticality
+      double-coding (D-10, D-19) remain separate and are not this gate.
   G3:
     status: NOT_EVALUATED
     description: Pilot outcome gate (confirmed ambiguous erosions, contrast, flake < 5%).

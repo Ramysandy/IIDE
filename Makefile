@@ -2,7 +2,7 @@ PY ?= .venv/bin/python
 TESTBED ?= billing_api
 TESTBEDS ?= billing_api file_portal
 
-.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs compare-baselines
+.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs compare-baselines g2-agreement
 
 install:
 	python3 -m venv .venv
@@ -56,3 +56,7 @@ score-runs:
 # Spec 15 / G4 construct check on four scripted patches. Never calls an LLM. Not a 144-run result.
 compare-baselines:
 	$(PY) scripts/compare_baselines.py
+
+# G2 kappa on docs/g2 annotator files. Exits 2 until annotator_b.yaml is complete. Does not set gates.yaml.
+g2-agreement:
+	$(PY) scripts/score_g2.py

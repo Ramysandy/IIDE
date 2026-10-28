@@ -1,7 +1,6 @@
 """G1 memo and matrix exist, and the recorded decision is explicit (spec 18 / 20).
 
-These tests do not establish novelty. They check that the sweep artifact is complete
-and that gates.yaml was not auto-set to PASSED.
+These tests do not establish novelty. They check that the sweep artifact is complete.
 """
 
 from __future__ import annotations
@@ -72,7 +71,7 @@ def test_g1_matrix_records_go_with_no_occupying_study():
     assert data["narrow_if"]
 
 
-def test_g1_gate_stays_open_until_a_human_signs_off():
+def test_g1_gate_is_passed_after_operator_sign_off():
     gates = load_gates_config()
-    assert gates.gates["G1"].status == "OPEN"
+    assert gates.gates["G1"].status == "PASSED"
     assert "g1_prior_art" in gates.gates["G1"].description

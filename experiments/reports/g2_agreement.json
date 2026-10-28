@@ -1,0 +1,8 @@
+{
+  "construct_kappa": null,
+  "erosion_vs_regression_kappa": null,
+  "n_items": 28,
+  "n_labelled_b": 0,
+  "note": "Second annotator file is incomplete. Kappa is not computed and G2 must not be set to PASSED.",
+  "status": "INCOMPLETE"
+}

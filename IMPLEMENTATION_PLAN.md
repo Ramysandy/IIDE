@@ -15,11 +15,11 @@ no tests, not a git repository.
 
 | Phase | Scope (spec section 18) | Gate / exit | Status |
 |---|---|---|---|
-| 0 | Prior-art sweep, novelty matrix, go/no-go memo | **G1** | `[x]` memo in `docs/g1_prior_art.md` (recommended GO); **G1 OPEN** until a human sets PASSED. Novelty is **not** claimed as established. |
+| 0 | Prior-art sweep, novelty matrix, go/no-go memo | **G1** | `[x]` memo in `docs/g1_prior_art.md`; **G1 PASSED** (operator sign-off 2026-10-28). Novelty is **not** claimed as established. |
 | 1 | Minimal vertical slice: one endpoint, telemetry, one safe attack, one frozen rule, fresh-instance replay, baseline JSON | Rule fires consistently; flake rate under pilot threshold | `[x]` see below |
-| 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 open** (needs human annotators) |
+| 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 OPEN** (28-item pack in `docs/g2/`; second annotator not done) |
 | 3 | Scoring library (RC, ED, LEI, IAE, IIF, SR, DG, CAI, ISP, NRG, Pareto), section 9 fixtures | Unit tests match hand calculations | `[x]` implemented and tested; bootstrap CIs deferred to Phase 7 |
-| 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[x]` harness + 144-row manifest + dry-run; **144-run not executed** (G1/G2 open, agents unconfigured) |
+| 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[x]` harness + 144-row manifest + dry-run; **144-run not executed** (G2 open, agents unconfigured) |
 | 5 | Baselines and decision | **G4** | `[x]` construct check on scripted patches; **G4 NOT_EVALUATED** for the 144-run (no 144-run exists) |
 | 6-7 | Scale or pivot; analysis and paper | | `[ ]` |
 
@@ -29,7 +29,7 @@ no tests, not a git repository.
 - [x] `IMPLEMENTATION_PLAN.md` with milestones and risks
 - [x] Prior-art sweep of named neighbors (Overeager, trace tampering, SecDrift, WeSCE, IaC regression, IFG) plus spec search phrases
 - [x] Novelty matrix and go/no-go memo (`docs/g1_prior_art.md`, `docs/g1_matrix.yaml`)
-- [ ] **G1 PASSED** by a human reviewer after spot-checking the memo. Recommended decision is GO for the combination only (D-40). Novelty is not claimed as established.
+- [x] **G1 PASSED** by operator sign-off 2026-10-28 on the recorded memo (D-40). Novelty is not claimed as established.
 
 ### Phase 1 task checklist
 
@@ -65,7 +65,7 @@ no tests, not a git repository.
 - [x] Catalog `security_basis` rule for `S_sec` (D-10); provisional criticality (D-19)
 - [x] Baseline artifacts per testbed, with 30-replay per-attack calibration (D-05) and `benign_set_hash`
 - [x] Tests: functional (billing 32, portal 25), oracle tests on both testbeds, telemetry-removal mutations (erosion and latent erosion)
-- [ ] **G2**: second annotator for criticality, `security_bearing` labels and ATT&CK mappings; kappa >= 0.6 on 25-30 examples. **Not done.**
+- [ ] **G2**: 28-item construct pack in `docs/g2/` (D-41). Fill `annotator_b.yaml` independently, then `make g2-agreement`. Target κ ≥ 0.6. `S_sec` / criticality double-coding (D-10, D-19) is still separate and provisional.
 - [ ] Prior-art review (G1) still open
 
 ### Phase 2 file map
@@ -98,7 +98,7 @@ no tests, not a git repository.
 - [x] Two agent slots in `configs/agents.yaml` (currently `unconfigured` placeholders)
 - [x] 144-run manifest (2 x 4 x 3 x 2 x 3) with stable run IDs; `make run-pilot DRY_RUN=1`
 - [x] Orchestration: build, frozen tests, replay, miss confirmation, scoring, run ledger, resumability
-- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, or instructions are unreviewed
+- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, or instructions are unreviewed (G1 now PASSED; G2 still OPEN)
 - [ ] **G3**: 144-run with real agents. **Not started.** Configure two adapters and close G1/G2 first.
 - [ ] Docker/network isolation still process-level (D-03/D-31)
 
@@ -123,7 +123,7 @@ no tests, not a git repository.
 - [x] IFG-style monitor: `UNAVAILABLE` (not fair/reproducible in this budget)
 - [x] Confusion vs replay-oracle `y` on four scripted patches; report at `experiments/reports/g4_calibration.{md,json}`
 - [x] `filter_lockout` verified as confirmed oracle erosion with tests still passing
-- [ ] **G4 on the 144-run:** blocked (G1/G2 open, agents unconfigured, 144-run not executed). `gates.yaml` G4 is `NOT_EVALUATED`.
+- [ ] **G4 on the 144-run:** blocked (G2 open, agents unconfigured, 144-run not executed). `gates.yaml` G4 is `NOT_EVALUATED`.
 
 ### Phase 5 file map
 
