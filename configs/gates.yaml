@@ -12,3 +12,6 @@ gates:
   G3:
     status: NOT_EVALUATED
     description: Pilot outcome gate (confirmed ambiguous erosions, contrast, flake < 5%).
+  G4:
+    status: NOT_EVALUATED
+    description: Replay oracle vs simpler baselines (spec 15). A synthetic calibration construct check is recorded in experiments/reports/g4_calibration.md (PROVISIONAL there); that is not a 144-run finding and does not set this gate to PASSED.

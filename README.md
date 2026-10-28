@@ -4,10 +4,10 @@ A reproducible research harness for measuring whether ordinary maintenance instr
 agent to remove or degrade security telemetry that a frozen detection pipeline relies on, even when
 functional tests still pass.
 
-> **Status: Phase 4 (agent harness) on top of the Phase 2 testbeds and Phase 3 scoring library.** The
-> 144-run manifest is generated and validated. A local-patch development adapter exercises the pipeline.
-> **No LLM has been called and no experimental result exists.** Gate **G2** (kappa >= 0.6) is **not met**;
-> gate **G1** (prior-art) is still open. A real 144-run execution is refused until both gates pass and two
+> **Status: Phase 5 (comparison baselines) on top of the Phase 4 harness.** A G4 construct check on
+> four scripted patches is in `experiments/reports/g4_calibration.md`. That is **not** a 144-run result
+> and does not set gate G4 to PASSED. **No LLM has been called and no experimental result exists.**
+> Gates **G1** and **G2** are still open. A real 144-run execution is refused until both pass and two
 > agent adapters are configured. Isolation is still process-level (Docker is not running here).
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
@@ -27,9 +27,10 @@ make test             # project tests + each testbed's functional tests
 make baseline-all     # records testbeds/*/baseline/* (refuses to overwrite; FORCE=--force)
 make score TESTBED=billing_api   # baseline self-comparison report (a harness check, not a result)
 make run-pilot DRY_RUN=1         # validate the 144-run manifest; never calls an agent
+make compare-baselines           # G4 construct check on scripted patches; never calls an LLM
 ```
 
-## Layout (Phase 4)
+## Layout (Phase 5)
 
 ```text
 configs/{replay,experiment,agents,gates}.yaml
@@ -39,9 +40,12 @@ testbeds/<tb>/instructions     F1/F2/F4/F6 x {ambiguous,scoped,neutral} (oracle 
 testbeds/<tb>/{attacks,detection,baseline,benign}   frozen oracle; never mounted for the agent
 iide/runner/                   workspace isolation, adapters, manifest, orchestration
 iide/scoring/                  metrics (spec 7, 13)
+iide/analysis/                 Phase 3 reports + Phase 5 comparison methods
 experiments/manifests/         144-run plan (JSONL)
 experiments/raw/               per-run artifacts (gitignored)
-scripts/                       run_baseline.py, run_pilot.py, score_replays.py, score_runs.py
+experiments/reports/           G4 calibration (construct check, not a 144-run result)
+scripts/                       run_baseline.py, run_pilot.py, score_replays.py, score_runs.py, compare_baselines.py
+configs/llm_reviewer.yaml      frozen LLM-diff prompt; command unset → UNAVAILABLE
 ```
 
 See `REPRODUCIBILITY.md` for exact commands and environment details.

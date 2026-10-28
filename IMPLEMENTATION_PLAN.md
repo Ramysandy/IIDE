@@ -4,7 +4,7 @@ Authoritative source: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Suppor
 proposal review, novelty check) are in [`docs/`](docs/). Engineering choices are recorded in
 [`DECISIONS.md`](DECISIONS.md).
 
-**Status legend:** `[x]` done and verified, `[ ]` not started. Nothing past Phase 4 is implemented.
+**Status legend:** `[x]` done and verified, `[ ]` not started. Nothing past Phase 5 is implemented.
 
 ## Repository state at start of Phase 1
 
@@ -20,7 +20,7 @@ no tests, not a git repository.
 | 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 open** (needs human annotators) |
 | 3 | Scoring library (RC, ED, LEI, IAE, IIF, SR, DG, CAI, ISP, NRG, Pareto), section 9 fixtures | Unit tests match hand calculations | `[x]` implemented and tested; bootstrap CIs deferred to Phase 7 |
 | 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[x]` harness + 144-row manifest + dry-run; **144-run not executed** (G1/G2 open, agents unconfigured) |
-| 5 | Baselines and decision | **G4** | `[ ]` |
+| 5 | Baselines and decision | **G4** | `[x]` construct check on scripted patches; **G4 NOT_EVALUATED** for the 144-run (no 144-run exists) |
 | 6-7 | Scale or pivot; analysis and paper | | `[ ]` |
 
 ### Phase 1 task checklist
@@ -104,6 +104,30 @@ no tests, not a git repository.
 | CLI | `scripts/run_pilot.py`, `scripts/score_runs.py`; `make manifest-pilot`, `make run-pilot DRY_RUN=1` |
 | Schemas | `schemas/{instruction,run_record}.schema.json` |
 
+### Phase 5 task checklist
+
+- [x] Functional-tests baseline (predicts `NONE` on eligible runs; misses telemetry-only loss by construction)
+- [x] Logging-statement AST diff (`_emit*` / `.emit` / `logging.*` call counts)
+- [x] Static signal-inventory (catalog event-type string literals vs frozen catalog)
+- [x] Dynamic signal-inventory (one replay; integration test on `filter_lockout`)
+- [x] SAST: Bandit run if CLI on PATH (still predicts `NONE` for this construct); CodeQL not found, not claimed
+- [x] LLM diff reviewer: frozen prompt, `command: null` → `UNAVAILABLE` (never invented)
+- [x] IFG-style monitor: `UNAVAILABLE` (not fair/reproducible in this budget)
+- [x] Confusion vs replay-oracle `y` on four scripted patches; report at `experiments/reports/g4_calibration.{md,json}`
+- [x] `filter_lockout` verified as confirmed oracle erosion with tests still passing
+- [ ] **G4 on the 144-run:** blocked (G1/G2 open, agents unconfigured, 144-run not executed). `gates.yaml` G4 is `NOT_EVALUATED`.
+
+### Phase 5 file map
+
+| Requirement | Files |
+|---|---|
+| Methods | `iide/analysis/comparison.py` |
+| Calibration fixtures | `iide/analysis/fixtures.py`, `tests/fixtures/local_patches/{erode_lockout,filter_lockout,erode_invoice_read,simplify_formatter}.yaml` |
+| LLM prompt (unconfigured) | `configs/llm_reviewer.yaml` |
+| CLI | `scripts/compare_baselines.py`; `make compare-baselines` |
+| Report | `experiments/reports/g4_calibration.{md,json}` |
+| Tests | `tests/unit/test_comparison_baselines.py`, `tests/integration/test_g4_calibration.py` |
+
 ## Dependencies between phases
 
 - Phase 2 reuses the Phase 1 testbed template, catalog/rule/mapping loaders, and replay runner. Editing
@@ -113,6 +137,8 @@ no tests, not a git repository.
 - Phase 4 needs a real workspace-isolation mechanism (spec 11.2). The harness copies an allowlisted
   workspace without oracle artifacts; the agent still runs as the same OS user and the network is not
   blocked (D-03/D-31). Upgrade before any untrusted-agent run.
+- Phase 5 compares simpler baselines to the replay oracle on **scripted** patches. It does not
+  substitute for G4 on a real 144-run (D-38, D-39).
 
 ## Risks
 
@@ -125,3 +151,4 @@ no tests, not a git repository.
 | Security-bearing labels and criticality are provisional | Second reviewer sign-off (G2) before any agent run (D-10, D-19) |
 | ATT&CK mapping is unverified (some attacks `UNMAPPED`) | Marked in each attack definition; validate before publication |
 | Novelty gap unverified | Phase 0 / gate G1 still open; no novelty claim is made anywhere |
+| G4 construct check ≠ G4 on the experiment | Calibration report is `PROVISIONAL`; `gates.yaml` G4 stays `NOT_EVALUATED` until a real 144-run exists (D-39) |

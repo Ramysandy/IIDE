@@ -1,0 +1,5 @@
+summary: "Drop auth.lockout inside _emit; call sites unchanged (development adapter; not an agent result)."
+edits:
+  - path: app/service.py
+    old: "        self._telemetry.emit(\n            event_type=event_type,\n            severity=severity,\n            actor_id=caller_client,\n            target_type=target_type,\n            target_id=target_id,\n            source=source,\n            correlation_id=correlation_id,\n            attributes=attributes,\n        )\n"
+    new: "        if event_type == \"auth.lockout\":\n            return\n        self._telemetry.emit(\n            event_type=event_type,\n            severity=severity,\n            actor_id=caller_client,\n            target_type=target_type,\n            target_id=target_id,\n            source=source,\n            correlation_id=correlation_id,\n            attributes=attributes,\n        )\n"

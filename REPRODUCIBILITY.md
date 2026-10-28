@@ -1,4 +1,4 @@
-# Reproducibility (Phase 4; experiment version `phase4-0.1`)
+# Reproducibility (Phase 5 on experiment version `phase4-0.1`)
 
 ## Environment
 
@@ -6,8 +6,10 @@
 - Dependencies are declared in `pyproject.toml` with lower bounds only. They are **not pinned yet**; the
   spec asks to pin after the pilot works. The versions actually used are recorded inside
   `testbeds/<tb>/baseline/baseline_coverage.json` (`environment`).
-- No secrets, network access, or LLM calls are needed for tests, baselines, or `make run-pilot DRY_RUN=1`.
-  A real 144-run would need configured agent adapters and API keys via environment variables (never committed).
+- No secrets, network access, or LLM calls are needed for tests, baselines, `make run-pilot DRY_RUN=1`,
+  or `make compare-baselines`. A real 144-run would need configured agent adapters and API keys via
+  environment variables (never committed). Bandit is used only if the `bandit` CLI is on PATH;
+  CodeQL is not claimed unless the `codeql` CLI is present.
 
 ## Setup and commands
 
@@ -24,6 +26,7 @@ make score TESTBED=file_portal                 # score a ledger vs the baseline;
 make manifest-pilot                            # write experiments/manifests/pilot.jsonl (144 rows)
 make run-pilot DRY_RUN=1                       # validate the 144-run plan; never calls an agent
 make score-runs                                # list primary attempts under experiments/raw/ (if any)
+make compare-baselines                         # G4 construct check; writes experiments/reports/g4_calibration.{md,json}
 ```
 
 Direct equivalents:
@@ -55,6 +58,20 @@ against `testbeds/T/baseline/baseline_replay_runs.jsonl` and writes `coverage_re
 not a result. Every report carries `scoring_package_hash` (hash of `iide/scoring/*.py`). The scoring code
 is outside the frozen replay hashes, so it does not invalidate the baselines.
 
+## Comparison baselines (Phase 5 / G4)
+
+`scripts/compare_baselines.py` (Make: `compare-baselines`) applies four scripted patches to
+`billing_api` and scores simpler methods against the replay-oracle labels of those patches. It never
+calls an LLM. Output:
+
+| File | Content |
+|---|---|
+| `experiments/reports/g4_calibration.md` | Human-readable confusion table and G4 construct-check note |
+| `experiments/reports/g4_calibration.json` | Same payload (`schema_version` 1.0) |
+
+This is a **construct check**, not a 144-run finding. `gates.yaml` G4 remains `NOT_EVALUATED`. Regenerating
+the report overwrites the previous derived files; the labels live in `iide/analysis/fixtures.py`.
+
 ## Freeze policy
 
 `baseline_coverage.json` stores hashes of the rule pack and mapping, attack set, telemetry schema and
@@ -68,5 +85,6 @@ baseline was recorded. Fixing that requires a new baseline under a new `experime
 - Replays and agent runs are isolated by a fresh process, not a container; outbound network is not blocked (D-03, D-31).
 - Criticality, `security_bearing` labels and ATT&CK mappings are provisional; G2 is open (D-10, D-19).
 - Instructions are DRAFT_UNREVIEWED (D-36). The 144-run has not been executed (D-35).
-- Phase 1 is reproducible from tag `phase1-baseline`; Phase 2 from `phase2-baseline`; Phase 3 from `phase3-scoring`.
+- G4 is a construct check on scripted patches (D-38, D-39), not a 144-run result.
+- Phase 1 is reproducible from tag `phase1-baseline`; Phase 2 from `phase2-baseline`; Phase 3 from `phase3-scoring`; Phase 4 from `phase4-harness`.
 - Timestamps and event IDs differ between runs by design; detection never depends on them.

@@ -2,7 +2,7 @@ PY ?= .venv/bin/python
 TESTBED ?= billing_api
 TESTBEDS ?= billing_api file_portal
 
-.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs
+.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs compare-baselines
 
 install:
 	python3 -m venv .venv
@@ -52,3 +52,7 @@ run-pilot:
 
 score-runs:
 	$(PY) scripts/score_runs.py
+
+# Spec 15 / G4 construct check on four scripted patches. Never calls an LLM. Not a 144-run result.
+compare-baselines:
+	$(PY) scripts/compare_baselines.py
