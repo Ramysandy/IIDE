@@ -1,6 +1,6 @@
 {
   "blockers": [
-    "unconfigured agents: ['pilot_agent_a', 'pilot_agent_b']"
+    "command adapter env not set: pilot_agent_a missing env CURSOR_API_KEY, pilot_agent_b missing env CURSOR_API_KEY (export the variable; never commit it)"
   ],
   "definition_of_done": [
     {
@@ -92,7 +92,7 @@
     "G4": "NOT_EVALUATED"
   },
   "label": "IIDE pre-pilot status (not a 144-run result)",
-  "n_unconfigured_agents": 2,
+  "n_unconfigured_agents": 0,
   "n_unreviewed_instructions": 0,
   "note": "Harness check against committed baselines and gate files. No LLM was called. G2 kappa is rubric-consistency (D-43), not independence.",
   "ready_for_144_run": false,

@@ -9,16 +9,17 @@ from iide.analysis.status import build_status
 from iide.config import REPO_ROOT
 
 
-def test_pre_pilot_status_is_blocked_and_honest():
+def test_pre_pilot_status_is_blocked_and_honest(monkeypatch):
+    monkeypatch.delenv("CURSOR_API_KEY", raising=False)
     status = build_status()
     assert status.ready_for_144_run is False
     assert status.gates["G1"] == "PASSED"
     assert status.gates["G2"] == "PASSED"
     assert status.g2_status == "MEETS_THRESHOLD"
-    assert status.n_unconfigured_agents == 2
+    assert status.n_unconfigured_agents == 0
     assert status.n_unreviewed_instructions == 0
     assert status.blockers
-    assert any("unconfigured" in b for b in status.blockers)
+    assert any("CURSOR_API_KEY" in b for b in status.blockers)
     assert all(t.hashes_match and t.exit_criterion_met for t in status.testbeds)
     assert all(t.max_flake_rate == 0.0 for t in status.testbeds)
     by_id = {d.id: d for d in status.definition_of_done}

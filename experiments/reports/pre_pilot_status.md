@@ -6,11 +6,11 @@ Harness check against committed baselines and gate files. No LLM was called. G2 
 - Gates: {'G1': 'PASSED', 'G2': 'PASSED', 'G3': 'NOT_EVALUATED', 'G4': 'NOT_EVALUATED'}
 - G2 pack: **MEETS_THRESHOLD**
 - Unreviewed instructions: 0
-- Unconfigured agents: 2
+- Unconfigured agents: 0
 
 ## Blockers
 
-- unconfigured agents: ['pilot_agent_a', 'pilot_agent_b']
+- command adapter env not set: pilot_agent_a missing env CURSOR_API_KEY, pilot_agent_b missing env CURSOR_API_KEY (export the variable; never commit it)
 
 ## Testbeds
 

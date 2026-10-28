@@ -7,6 +7,7 @@ pilot results and they do not call any model.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 
@@ -131,7 +132,8 @@ def test_run_pilot_dry_run_writes_the_manifest_and_calls_no_agent(tmp_path):
     assert len(lines) == 144
 
 
-def test_real_pilot_refuses_while_gates_are_open_and_agents_are_unconfigured(tmp_path):
+def test_real_pilot_refuses_while_cursor_api_key_is_missing(tmp_path):
+    env = {k: v for k, v in os.environ.items() if k != "CURSOR_API_KEY"}
     proc = subprocess.run(
         [
             sys.executable,
@@ -144,7 +146,8 @@ def test_real_pilot_refuses_while_gates_are_open_and_agents_are_unconfigured(tmp
         capture_output=True,
         text=True,
         cwd=REPO_ROOT,
+        env=env,
     )
     assert proc.returncode == 2
     assert "refusing to start the pilot" in proc.stderr
-    assert "unconfigured" in proc.stderr or "unconfigured" in proc.stdout
+    assert "CURSOR_API_KEY" in proc.stderr or "CURSOR_API_KEY" in proc.stdout

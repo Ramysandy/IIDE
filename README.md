@@ -12,7 +12,7 @@ functional tests still pass.
 > provisional. `make report` writes a pre-pilot status file, not a 144-run result. A G4
 > construct check on scripted patches is in `experiments/reports/g4_calibration.md` and does
 > not set G4 to PASSED. **No LLM has been called and no experimental result exists.** A real
-> 144-run is refused until two agent adapters are configured. Isolation is still process-level.
+> 144-run is refused until `CURSOR_API_KEY` is set (D-45). Isolation is still process-level.
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source

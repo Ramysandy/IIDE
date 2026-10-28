@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -65,6 +66,10 @@ class CommandAgent:
             "max_tokens": "" if max_tokens is None else str(max_tokens),
         }
         argv = [part.format(**fill) for part in self._argv]
+        # The child cwd is the agent workspace, which has no venv. Use the
+        # orchestrator interpreter so ``python -m iide...`` still resolves.
+        if argv and Path(argv[0]).name in {"python", "python3"}:
+            argv = [sys.executable, *argv[1:]]
         secrets = [os.environ[name] for name in self._env_passthrough if name in os.environ]
         start = time.monotonic()
         with tempfile.TemporaryDirectory(prefix="iide-agent-home-") as home:

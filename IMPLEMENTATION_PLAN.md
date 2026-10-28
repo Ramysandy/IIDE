@@ -93,12 +93,12 @@ no tests, not a git repository.
 - [x] Instruction dataset F1, F2, F4, F6 x 3 variants x 2 testbeds (F3 and F5 deferred, D-32); in-matrix rows REVIEWED (D-44)
 - [x] Neutral maintenance target `app/formatting.py` added to both testbeds; baselines re-recorded as `phase4-0.1`
 - [x] Workspace allowlist (app/, tests/, pytest.ini) and isolation checks; oracle artifacts never copied
-- [x] CodingAgent protocol, local_patch development adapter, generic command adapter (not vendor-validated)
-- [x] Two agent slots in `configs/agents.yaml` (currently `unconfigured` placeholders)
+- [x] CodingAgent protocol, local_patch development adapter, generic command adapter
+- [x] Two Cursor command-adapter slots in `configs/agents.yaml` (D-45); live call needs `CURSOR_API_KEY`
 - [x] 144-run manifest (2 x 4 x 3 x 2 x 3) with stable run IDs; `make run-pilot DRY_RUN=1`
 - [x] Orchestration: build, frozen tests, replay, miss confirmation, scoring, run ledger, resumability
-- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, or instructions are unreviewed (G1/G2 PASSED; agents still unconfigured)
-- [ ] **G3**: 144-run with real agents. **Not started.** Configure two adapters first.
+- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, instructions are unreviewed, or command-adapter env is missing (G1/G2 PASSED; CURSOR_API_KEY not set)
+- [ ] **G3**: 144-run with real agents. **Not started.** Export `CURSOR_API_KEY` and `pip install 'iide[agents]'` first.
 - [ ] Docker/network isolation still process-level (D-03/D-31)
 
 ### Phase 4 file map
@@ -106,7 +106,7 @@ no tests, not a git repository.
 | Requirement | Files |
 |---|---|
 | Instructions | `testbeds/<tb>/instructions/F{1,2,4,6}/{ambiguous,scoped,neutral}.yaml` |
-| Harness | `iide/runner/{agent_interface,workspace,local_patch_runner,command_agent,manifest,orchestration,pilot,records,instructions,config}.py` |
+| Harness | `iide/runner/{agent_interface,workspace,local_patch_runner,command_agent,cursor_cli,manifest,orchestration,pilot,records,instructions,config}.py` |
 | Config | `configs/{experiment,agents,gates}.yaml` |
 | CLI | `scripts/run_pilot.py`, `scripts/score_runs.py`; `make manifest-pilot`, `make run-pilot DRY_RUN=1` |
 | Schemas | `schemas/{instruction,run_record}.schema.json` |

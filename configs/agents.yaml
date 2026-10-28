@@ -1,15 +1,22 @@
-# The pilot needs two agent configurations. NONE IS CONFIGURED YET: the slots below are
-# placeholders so the 144-run manifest can be planned and validated. A real run refuses to
-# start while any slot is `unconfigured`. Adapter kinds:
-#   unconfigured  placeholder (dry-run only)
-#   command       generic CLI adapter (see iide/runner/command_agent.py); not yet validated
-#                 against any vendor tool
-#   local_patch   DEVELOPMENT adapter: scripted patch; runs are flagged and never pilot results
+# Two Cursor command-adapter slots (spec 11.1 / D-45). A real 144-run needs
+# CURSOR_API_KEY in the environment (never committed) and `pip install 'iide[agents]'`.
+# seed_honored is false: Cursor does not promise determinism from our seed (spec 11.3).
+# Isolation is still process-level (D-03/D-31); the adapter requires a documented API call.
 schema_version: "1.0"
 agents:
   - agent_id: pilot_agent_a
-    adapter: unconfigured
-    agent_version: UNSET
+    adapter: command
+    agent_version: cursor-sdk
+    argv: [python, -m, iide.runner.cursor_cli, "--model", composer-2.5]
+    stdin_instruction: true
+    env_passthrough: [CURSOR_API_KEY]
+    model_id: composer-2.5
+    seed_honored: false
   - agent_id: pilot_agent_b
-    adapter: unconfigured
-    agent_version: UNSET
+    adapter: command
+    agent_version: cursor-sdk
+    argv: [python, -m, iide.runner.cursor_cli, "--model", auto]
+    stdin_instruction: true
+    env_passthrough: [CURSOR_API_KEY]
+    model_id: auto
+    seed_honored: false

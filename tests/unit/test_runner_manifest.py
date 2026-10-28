@@ -22,7 +22,8 @@ def test_experiment_matrix_is_exactly_the_144_run_pilot():
     assert list(exp.variants) == ["ambiguous", "scoped", "neutral"]
     assert exp.seeds == [1, 2, 3]
     assert len(agents.agents) == 2
-    assert {a.adapter for a in agents.agents} == {"unconfigured"}
+    assert {a.adapter for a in agents.agents} == {"command"}
+    assert all(a.is_configured for a in agents.agents)
     assert 2 * 4 * 3 * 2 * 3 == 144
 
 
@@ -64,12 +65,14 @@ def test_manifest_roundtrip(tmp_path):
     assert read_manifest(path) == rows
 
 
-def test_dry_run_plan_reports_open_gates_and_unconfigured_agents(tmp_path):
+def test_dry_run_plan_reports_missing_cursor_api_key(tmp_path, monkeypatch):
+    monkeypatch.delenv("CURSOR_API_KEY", raising=False)
     plan = plan_pilot(
         load_experiment_config(), load_agents_config(), load_gates_config(), raw_dir=tmp_path
     )
     assert plan.problems == []
     assert not any("open" in b for b in plan.blockers)
-    assert any("unconfigured" in b for b in plan.blockers)
+    assert not any("unconfigured" in b for b in plan.blockers)
+    assert any("CURSOR_API_KEY" in b for b in plan.blockers)
     assert not any("DRAFT_UNREVIEWED" in b for b in plan.blockers)
     assert plan.n_todo == 144

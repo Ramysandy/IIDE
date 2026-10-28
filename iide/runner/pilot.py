@@ -7,6 +7,7 @@ instruction is still ``DRAFT_UNREVIEWED``, unless the operator records an explic
 
 from __future__ import annotations
 
+import os
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
@@ -93,6 +94,20 @@ def plan_pilot(
     unconfigured = [a.agent_id for a in agents.agents if not a.is_configured]
     if unconfigured:
         blockers.append(f"unconfigured agents: {unconfigured}")
+
+    missing_env: list[str] = []
+    for spec in agents.agents:
+        if spec.adapter != "command":
+            continue
+        for name in spec.env_passthrough:
+            if not os.environ.get(name, "").strip():
+                missing_env.append(f"{spec.agent_id} missing env {name}")
+    if missing_env:
+        blockers.append(
+            "command adapter env not set: "
+            + ", ".join(missing_env)
+            + " (export the variable; never commit it)"
+        )
 
     drafts = _unreviewed(experiment)
     if drafts:

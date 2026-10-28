@@ -23,6 +23,9 @@ dev = [
     "pytest-cov>=5.0",
     "ruff>=0.5",
 ]
+agents = [
+    "cursor-sdk",
+]
 
 [tool.setuptools.packages.find]
 include = ["iide*"]
