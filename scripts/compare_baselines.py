@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Compare simpler baselines against the replay oracle on the calibration fixtures (spec 15).
 
-This is a construct check, not a 144-run result. It never calls an LLM. Bandit is run only
-if the CLI is on PATH.
+This is a construct check, not a 144-run result. Default path never calls an LLM. Bandit is
+run only if the CLI is on PATH. ``--with-llm`` calls Cohere on the four diffs when
+``COHERE_API_KEY`` is set (never committed); trial keys should not be used for a 144-run.
 
 Usage:
   python scripts/compare_baselines.py
   python scripts/compare_baselines.py --output-dir experiments/reports
+  python scripts/compare_baselines.py --with-llm
 """
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ from iide.analysis.comparison import (  # noqa: E402
     ifg_monitor,
     llm_reviewer,
     logger_call_diff,
+    render_markdown,
     sast_bandit,
     static_event_literal_diff,
 )
@@ -44,25 +47,41 @@ LIMITATIONS = [
     "dynamic_inventory is optional and uses one replay per attack, not the k=5 oracle.",
     "Bandit has no missing-telemetry query; if run, it still predicts NONE for this construct.",
     "CodeQL is recorded only if the codeql CLI is on PATH; it was not, and is not claimed as run.",
-    "LLM reviewer and IFG monitor are UNAVAILABLE (not configured / not in budget).",
+    "IFG monitor is UNAVAILABLE (not implemented in this budget).",
     "Latent erosion (y=0) is an oracle-negative; flagging it is a false positive vs EROSION.",
 ]
 
+LLM_OFF_LIMIT = (
+    "LLM reviewer is UNAVAILABLE unless --with-llm and COHERE_API_KEY are both set; "
+    "not claimed as run on the default path."
+)
+LLM_ON_LIMIT = (
+    "LLM reviewer is Cohere command-r7b-12-2024 on four scripted diffs (trial-safe). "
+    "Not a 144-run. seed_honored is not claimed. UNKNOWN/unparseable maps to UNAVAILABLE."
+)
+
 
 def _source_methods(
-    baseline_app: Path, candidate_app: Path, catalog, security, diff: str, tests_passed: bool
+    baseline_app: Path,
+    candidate_app: Path,
+    catalog,
+    security,
+    diff: str,
+    tests_passed: bool,
+    *,
+    call_llm: bool,
 ):
     return [
         functional_tests_method(tests_passed),
         logger_call_diff(baseline_app, candidate_app),
         static_event_literal_diff(baseline_app, candidate_app, catalog, security),
         sast_bandit(baseline_app, candidate_app),
-        llm_reviewer(diff),
+        llm_reviewer(diff, call_llm=call_llm),
         ifg_monitor(),
     ]
 
 
-def run_calibration() -> ComparisonReport:
+def run_calibration(*, call_llm: bool = False) -> ComparisonReport:
     cases: list[CasePrediction] = []
     with tempfile.TemporaryDirectory(prefix="iide-g4-") as tmp:
         tmp_dir = Path(tmp)
@@ -72,7 +91,13 @@ def run_calibration() -> ComparisonReport:
             security = security_bearing_event_types(tb.catalog)
             baseline_app, candidate_app, diff = materialise(spec, tmp_dir / spec.case_id)
             methods = _source_methods(
-                baseline_app, candidate_app, catalog, security, diff, spec.tests_passed
+                baseline_app,
+                candidate_app,
+                catalog,
+                security,
+                diff,
+                spec.tests_passed,
+                call_llm=call_llm,
             )
             cases.append(
                 CasePrediction(
@@ -83,69 +108,44 @@ def run_calibration() -> ComparisonReport:
                     methods=methods,
                 )
             )
+    if call_llm:
+        note = (
+            "Construct check against the replay-oracle labels of four scripted patches. "
+            "Not a 144-run result. Cohere command-r7b-12-2024 was requested for the "
+            "LLM reviewer (four HTTP calls at most)."
+        )
+        limits = [*LIMITATIONS, LLM_ON_LIMIT]
+    else:
+        note = (
+            "Construct check against the replay-oracle labels of four scripted patches. "
+            "Not a 144-run result. No LLM was called."
+        )
+        limits = [*LIMITATIONS, LLM_OFF_LIMIT]
     return build_report(
         cases,
         label="Phase 5 calibration suite (billing_api scripted patches)",
-        note=(
-            "Construct check against the replay-oracle labels of four scripted patches. "
-            "Not a 144-run result. No LLM was called."
-        ),
-        limitations=LIMITATIONS,
+        note=note,
+        limitations=limits,
     )
-
-
-def render_markdown(report: ComparisonReport) -> str:
-    lines = [
-        f"# {report.label}",
-        "",
-        report.note,
-        "",
-        f"- G4 status: **{report.g4.status}**",
-        f"- {report.g4.note}",
-        "",
-        "## Cases",
-        "",
-        "| Case | oracle y | class | functional | logger | literals | bandit | llm | ifg |",
-        "|---|---:|---|---|---|---|---|---|---|",
-    ]
-    order = [
-        "functional_tests",
-        "logger_call_diff",
-        "static_event_literals",
-        "sast_bandit",
-        "llm_reviewer",
-        "ifg_monitor",
-    ]
-    for c in report.cases:
-        by = {m.method_id: m.prediction for m in c.methods}
-        cells = " | ".join(by.get(k, "?") for k in order)
-        lines.append(f"| {c.case_id} | {c.oracle_y} | {c.oracle_class} | {cells} |")
-    lines += ["", "## Confusion vs confirmed erosion (y=1)", ""]
-    lines.append("| Method | TP | FP | FN | TN | una | recall | FPR | FN cases |")
-    lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---|")
-    for t in report.confusion:
-        rec = "n/a" if t.recall is None else f"{t.recall:.2f}"
-        fpr = "n/a" if t.fpr is None else f"{t.fpr:.2f}"
-        lines.append(
-            f"| {t.method_id} | {t.tp} | {t.fp} | {t.fn} | {t.tn} | {t.unavailable} | "
-            f"{rec} | {fpr} | {', '.join(t.false_negatives) or '—'} |"
-        )
-    lines += ["", "## Limitations", ""]
-    lines.extend(f"- {x}" for x in report.limitations)
-    lines.append("")
-    return "\n".join(lines)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--output-dir", type=Path, default=REPO_ROOT / "experiments" / "reports")
+    parser.add_argument(
+        "--with-llm",
+        action="store_true",
+        help="Call Cohere on the four calibration diffs if COHERE_API_KEY is set. "
+        "Writes g4_llm_reviewer.{md,json}; does not overwrite g4_calibration.",
+    )
     args = parser.parse_args(argv)
 
-    report = run_calibration()
+    report = run_calibration(call_llm=args.with_llm)
     args.output_dir.mkdir(parents=True, exist_ok=True)
+    stem = "g4_llm_reviewer" if args.with_llm else "g4_calibration"
     md = render_markdown(report)
-    (args.output_dir / "g4_calibration.md").write_text(md, encoding="utf-8")
-    (args.output_dir / "g4_calibration.json").write_text(
+    (args.output_dir / f"{stem}.md").write_text(md, encoding="utf-8")
+    (args.output_dir / f"{stem}.json").write_text(
         json.dumps(report.model_dump(mode="json"), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )

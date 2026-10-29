@@ -7,9 +7,10 @@
   spec asks to pin after the pilot works. The versions actually used are recorded inside
   `testbeds/<tb>/baseline/baseline_coverage.json` (`environment`).
 - No secrets, network access, or LLM calls are needed for tests, baselines, `make run-pilot DRY_RUN=1`,
-  or `make compare-baselines`. A real 144-run needs `CURSOR_API_KEY` (never committed) and
-  `pip install 'iide[agents]'` (D-45). Bandit is used only if the `bandit` CLI is on PATH;
-  CodeQL is not claimed unless the `codeql` CLI is present.
+  or default `make compare-baselines`. Optional `make compare-baselines WITH_LLM=1` needs
+  `COHERE_API_KEY` (never committed) and makes four Chat calls (D-47). A real 144-run needs
+  `CURSOR_API_KEY` (never committed) and `pip install 'iide[agents]'` (D-45). Bandit is used
+  only if the `bandit` CLI is on PATH; CodeQL is not claimed unless the `codeql` CLI is present.
 
 ## Setup and commands
 
@@ -26,9 +27,12 @@ make score TESTBED=file_portal                 # score a ledger vs the baseline;
 make manifest-pilot                            # write experiments/manifests/pilot.jsonl (144 rows)
 make run-pilot DRY_RUN=1                       # validate the 144-run plan; never calls an agent
 make score-runs                                # list primary attempts under experiments/raw/ (if any)
+make score-matched                             # IAE/IIF/SR/DG on billing_api F1 composer seed 1
 make compare-baselines                         # G4 construct check; writes experiments/reports/g4_calibration.{md,json}
+make compare-live                              # G4 on live F1 diffs; writes experiments/reports/g4_f1_live.{md,json}
+make compare-baselines WITH_LLM=1              # four Cohere calls if COHERE_API_KEY is set; writes g4_llm_reviewer.{md,json}
 make g2-agreement                              # G2 kappa; exits 2 if annotator_b.yaml is incomplete; does not set gates.yaml
-make report                                    # pre-pilot status (spec 16); writes experiments/reports/pre_pilot_status.{md,json}
+make report                                    # harness check (pre_pilot_status); points at experiments/reports/pilot_report.md
 make export-reviews                            # blinded A2 worksheets under docs/reviews/; does not fill B or set REVIEWED
 ```
 
@@ -64,16 +68,27 @@ is outside the frozen replay hashes, so it does not invalidate the baselines.
 ## Comparison baselines (Phase 5 / G4)
 
 `scripts/compare_baselines.py` (Make: `compare-baselines`) applies four scripted patches to
-`billing_api` and scores simpler methods against the replay-oracle labels of those patches. It never
-calls an LLM. Output:
+`billing_api` and scores simpler methods against the replay-oracle labels of those patches. Default
+path never calls an LLM. `--with-llm` calls Cohere `command-r7b-12-2024` on those four diffs only
+when `COHERE_API_KEY` is set, and writes a separate report so the deterministic calibration file is
+not overwritten. Output:
 
 | File | Content |
 |---|---|
-| `experiments/reports/g4_calibration.md` | Human-readable confusion table and G4 construct-check note |
+| `experiments/reports/g4_calibration.md` | Human-readable confusion table and G4 construct-check note (no LLM) |
 | `experiments/reports/g4_calibration.json` | Same payload (`schema_version` 1.0) |
+| `experiments/reports/g4_llm_reviewer.md` | Same table after `--with-llm` (Cohere; not a 144-run) |
+| `experiments/reports/g4_llm_reviewer.json` | Same payload; `llm_reviewer.detail` is redacted |
+| `experiments/reports/g4_f1_live.md` | G4 on the three live F1 composer diffs (no LLM) |
+| `experiments/reports/f1_composer_seed1.md` | IAE/IIF/SR/DG on billing_api-F1 seed 1 (no CIs) |
+| `experiments/reports/pilot_report.md` | Paper-facing F1 pilot report (not 144) |
 
-This is a **construct check**, not a 144-run finding. `gates.yaml` G4 remains `NOT_EVALUATED`. Regenerating
-the report overwrites the previous derived files; the labels live in `iide/analysis/fixtures.py`.
+Scripted calibration is a **construct check**, not a 144-run finding. Regenerating
+`g4_calibration.*` overwrites the previous derived files; the labels live in
+`iide/analysis/fixtures.py`. Live F1 diffs are scored by `scripts/compare_live.py`
+(`make compare-live`) into `g4_f1_live.{md,json}`. Operator set G4 PASSED on those
+live diffs only (D-48); the analysis module still labels the construct check
+`PROVISIONAL`. The 144-run was not executed.
 
 ## Freeze policy
 
@@ -87,11 +102,14 @@ baseline was recorded. Fixing that requires a new baseline under a new `experime
 
 - Replays and agent runs are isolated by a fresh process, not a container; outbound network is not blocked (D-03, D-31).
 - Criticality, `security_bearing` labels and ATT&CK mappings are provisional (D-10, D-19).
-- In-matrix instructions are REVIEWED (D-44). The 144-run has not been executed (D-35).
-- G4 is a construct check on scripted patches (D-38, D-39), not a 144-run result.
+- In-matrix instructions are REVIEWED (D-44). The 144-run has not been executed (D-35). The F1 composer seed-1 triple has (D-48).
+- G4 scripted calibration is D-38/D-39. G4 on the three live F1 diffs is D-48 (`gates.yaml` PASSED for those diffs only).
 - G1 sweep is in `docs/g1_prior_art.md` (D-40). Recommended GO; operator set G1 PASSED 2026-10-28.
 - G2 construct pack is `docs/g2/` (D-41–D-44). A2 is filled; construct κ = 1.000; operator set G2 PASSED with the restriction that this is not independent human reliability. `S_sec` and criticality catalog/attack YAML remain provisional.
-- `make report` is a pre-pilot harness check (D-42), not a 144-run result.
-- Cursor command adapters are configured (D-45). A 144-run still needs `CURSOR_API_KEY`.
+- `make report` is a harness check (D-42). The paper-facing pilot report is `experiments/reports/pilot_report.md`.
+- Cursor command adapters are configured (D-45). Three live `composer-2.5` cells exist; `auto` was not called. A 144-run still needs `CURSOR_API_KEY`.
+- Cell-filtered live example (restores `pilot.jsonl` timestamps after; never commit the key):
+  `python scripts/run_pilot.py --testbed billing_api --family F1 --variant scoped --agent pilot_agent_a --seed 1`
+- Optional Cohere LLM reviewer is D-47. It is not a coding agent and does not replace Cursor.
 - Phase 1 is reproducible from tag `phase1-baseline`; Phase 2 from `phase2-baseline`; Phase 3 from `phase3-scoring`; Phase 4 from `phase4-harness`; Phase 5 from `phase5-baselines`.
 - Timestamps and event IDs differ between runs by design; detection never depends on them.

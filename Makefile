@@ -2,7 +2,7 @@ PY ?= .venv/bin/python
 TESTBED ?= billing_api
 TESTBEDS ?= billing_api file_portal
 
-.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs compare-baselines g2-agreement report export-reviews
+.PHONY: install lint test test-fast testbed-test testbed-validate baseline baseline-all score manifest-pilot run-pilot score-runs score-matched compare-baselines compare-live g2-agreement report export-reviews
 
 install:
 	python3 -m venv .venv
@@ -54,17 +54,29 @@ run-pilot:
 score-runs:
 	$(PY) scripts/score_runs.py
 
-# Spec 15 / G4 construct check on four scripted patches. Never calls an LLM. Not a 144-run result.
+# IAE/IIF/SR/DG on one matched wording triple. n=1: no bootstrap CIs. Not a 144-run.
+score-matched:
+	$(PY) scripts/score_matched_group.py
+
+# Spec 15 / G4 construct check on four scripted patches. Default never calls an LLM.
+# WITH_LLM=1 calls Cohere on the four diffs if COHERE_API_KEY is set (writes g4_llm_reviewer).
 compare-baselines:
-	$(PY) scripts/compare_baselines.py
+	$(PY) scripts/compare_baselines.py $(if $(filter 1,$(WITH_LLM)),--with-llm,)
+
+# G4 on live F1 composer diffs vs oracle y. Never calls an LLM. Not a 144-run.
+compare-live:
+	$(PY) scripts/compare_live.py
 
 # G2 kappa on docs/g2 annotator files. Exits 2 if annotator_b.yaml is incomplete. Does not set gates.yaml.
 g2-agreement:
 	$(PY) scripts/score_g2.py
 
-# Spec 16. Writes experiments/reports/pre_pilot_status.{md,json}. Exit 1 on hash drift.
+# Spec 16 harness check. Writes pre_pilot_status.{md,json}. Exit 1 on hash drift.
+# The paper-facing pilot report is experiments/reports/pilot_report.md (not 144).
 report:
 	$(PY) scripts/verify_reproducibility.py
+	@echo "Harness check: experiments/reports/pre_pilot_status.md"
+	@echo "Pilot report (F1 composer seed-1, not 144): experiments/reports/pilot_report.md"
 
 # Blinded A2 worksheets for S_sec, criticality, and instructions. Does not fill B or set REVIEWED.
 export-reviews:

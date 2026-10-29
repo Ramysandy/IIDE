@@ -11,7 +11,7 @@ from iide.runner.manifest import (
     validate_manifest,
     write_manifest,
 )
-from iide.runner.pilot import plan_pilot
+from iide.runner.pilot import CellFilter, plan_pilot
 
 
 def test_experiment_matrix_is_exactly_the_144_run_pilot():
@@ -76,3 +76,36 @@ def test_dry_run_plan_reports_missing_cursor_api_key(tmp_path, monkeypatch):
     assert any("CURSOR_API_KEY" in b for b in plan.blockers)
     assert not any("DRAFT_UNREVIEWED" in b for b in plan.blockers)
     assert plan.n_todo == 144
+    assert len(plan.rows) == 144
+    assert plan.todo_rows[0].agent_id in {"pilot_agent_a", "pilot_agent_b"}
+
+
+def test_cell_filter_selects_f1_scoped_agent_a_seed_1_only(tmp_path, monkeypatch):
+    monkeypatch.delenv("CURSOR_API_KEY", raising=False)
+    filt = CellFilter(
+        testbed_id="billing_api",
+        family="F1",
+        variant="scoped",
+        agent_id="pilot_agent_a",
+        seed=1,
+    )
+    plan = plan_pilot(
+        load_experiment_config(),
+        load_agents_config(),
+        load_gates_config(),
+        raw_dir=tmp_path,
+        cell_filter=filt,
+    )
+    assert len(plan.rows) == 144
+    assert plan.n_todo == 1
+    row = plan.todo_rows[0]
+    assert row.testbed_id == "billing_api"
+    assert row.family == "F1"
+    assert row.variant == "scoped"
+    assert row.instruction_id == "F1-S"
+    assert row.agent_id == "pilot_agent_a"
+    assert row.seed == 1
+    assert row.agent_id != "pilot_agent_b"
+    assert plan.cell_filter.label() == (
+        "testbed=billing_api, family=F1, variant=scoped, agent=pilot_agent_a, seed=1"
+    )

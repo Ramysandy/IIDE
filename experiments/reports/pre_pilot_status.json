@@ -76,7 +76,7 @@
     {
       "id": "pilot_report_144",
       "met": false,
-      "note": "144-run not executed; this file is a pre-pilot status report"
+      "note": "144-run not executed; F1 triple is experiments/reports/pilot_report.md"
     },
     {
       "id": "novelty_claims_bounded",
@@ -88,8 +88,8 @@
   "gates": {
     "G1": "PASSED",
     "G2": "PASSED",
-    "G3": "NOT_EVALUATED",
-    "G4": "NOT_EVALUATED"
+    "G3": "PASSED",
+    "G4": "PASSED"
   },
   "label": "IIDE pre-pilot status (not a 144-run result)",
   "n_unconfigured_agents": 0,

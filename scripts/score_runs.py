@@ -15,23 +15,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from iide.runner.pilot import DEFAULT_RAW_DIR  # noqa: E402
-from iide.runner.records import RunRecord, select_primary  # noqa: E402
+from iide.runner.records import RunRecord, load_primary_records  # noqa: E402
 
 
 def _load_primaries(raw_dir: Path) -> list[RunRecord]:
-    out = []
-    if not raw_dir.is_dir():
-        return out
-    for run_dir in sorted(p for p in raw_dir.iterdir() if p.is_dir()):
-        attempts = []
-        for d in sorted(run_dir.glob("attempt-*")):
-            path = d / "run_record.json"
-            if path.is_file():
-                attempts.append(RunRecord.model_validate_json(path.read_text(encoding="utf-8")))
-        primary = select_primary(attempts)
-        if primary is not None:
-            out.append(primary)
-    return out
+    return load_primary_records(raw_dir)
 
 
 def main(argv: list[str] | None = None) -> int:

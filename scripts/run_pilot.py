@@ -8,6 +8,8 @@ unconfigured, unless an override reason is recorded.
 Usage:
   python scripts/run_pilot.py --dry-run
   python scripts/run_pilot.py --manifest-only
+  python scripts/run_pilot.py --testbed billing_api --family F1 --variant scoped \\
+      --agent pilot_agent_a --seed 1
   python scripts/run_pilot.py --allow-open-gates "reason" --allow-unreviewed "reason"
 """
 
@@ -24,6 +26,7 @@ from iide.runner.manifest import write_manifest  # noqa: E402
 from iide.runner.pilot import (  # noqa: E402
     DEFAULT_MANIFEST,
     DEFAULT_RAW_DIR,
+    CellFilter,
     PilotRefused,
     default_configs,
     execute_plan,
@@ -47,7 +50,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--raw-dir", type=Path, default=DEFAULT_RAW_DIR)
-    parser.add_argument("--testbed", help="restrict to one testbed id")
+    parser.add_argument("--testbed", help="restrict execution to one testbed id")
+    parser.add_argument("--agent", help="restrict execution to one agent_id")
+    parser.add_argument("--family", help="restrict execution to one instruction family (e.g. F1)")
+    parser.add_argument(
+        "--variant",
+        choices=["ambiguous", "scoped", "neutral"],
+        help="restrict execution to one wording variant",
+    )
+    parser.add_argument("--seed", type=int, help="restrict execution to one seed")
     parser.add_argument("--limit", type=int, help="execute at most N remaining cells")
     parser.add_argument(
         "--force-rerun",
@@ -67,6 +78,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     experiment, agents, gates = default_configs()
+    cell_filter = CellFilter(
+        testbed_id=args.testbed,
+        agent_id=args.agent,
+        family=args.family,
+        variant=args.variant,
+        seed=args.seed,
+    )
     try:
         plan = plan_pilot(
             experiment,
@@ -77,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
             allow_unreviewed=args.allow_unreviewed,
             force_rerun=args.force_rerun,
             limit=args.limit,
-            testbed_id=args.testbed,
+            cell_filter=cell_filter,
         )
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -102,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
             allow_unreviewed=args.allow_unreviewed,
             force_rerun=args.force_rerun,
             limit=args.limit,
-            testbed_id=args.testbed,
+            cell_filter=cell_filter,
         )
     except PilotRefused as exc:
         print(f"refusing to start the pilot: {exc}", file=sys.stderr)

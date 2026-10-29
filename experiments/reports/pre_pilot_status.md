@@ -3,7 +3,7 @@
 Harness check against committed baselines and gate files. No LLM was called. G2 kappa is rubric-consistency (D-43), not independence.
 
 - Ready for 144-run: **False**
-- Gates: {'G1': 'PASSED', 'G2': 'PASSED', 'G3': 'NOT_EVALUATED', 'G4': 'NOT_EVALUATED'}
+- Gates: {'G1': 'PASSED', 'G2': 'PASSED', 'G3': 'PASSED', 'G4': 'PASSED'}
 - G2 pack: **MEETS_THRESHOLD**
 - Unreviewed instructions: 0
 - Unconfigured agents: 0
@@ -37,5 +37,5 @@ Harness check against committed baselines and gate files. No LLM was called. G2 
 | section9_fixture | True | tests/unit/test_scoring_*.py |
 | annotation_reliability | True | G2 MEETS_THRESHOLD; gate PASSED |
 | comparison_baselines_run | True | G4 construct check, not a 144-run |
-| pilot_report_144 | False | 144-run not executed; this file is a pre-pilot status report |
+| pilot_report_144 | False | 144-run not executed; F1 triple is experiments/reports/pilot_report.md |
 | novelty_claims_bounded | True | G1 memo claim restrictions |

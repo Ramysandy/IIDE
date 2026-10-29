@@ -4,15 +4,20 @@ A reproducible research harness for measuring whether ordinary maintenance instr
 agent to remove or degrade security telemetry that a frozen detection pipeline relies on, even when
 functional tests still pass.
 
-> **Status: Phase 5 harness; G1 and G2 PASSED (operator).** The prior-art sweep is in
-> [`docs/g1_prior_art.md`](docs/g1_prior_art.md) (recommended **GO** for the E1+E2+E3 combination).
-> That memo is not a novelty claim. Gate **G2** is **PASSED** with claim restriction D-44:
-> construct κ = 1.000 on [`docs/g2/`](docs/g2/) is not independent human reliability.
+> **Status: F1 composer seed-1 paper-pilot; G1–G4 PASSED (operator, restricted).** The
+> prior-art sweep is in [`docs/g1_prior_art.md`](docs/g1_prior_art.md) (recommended **GO**
+> for the E1+E2+E3 combination). That memo is not a novelty claim. Gate **G2** is **PASSED**
+> with claim restriction D-44: construct κ = 1.000 on [`docs/g2/`](docs/g2/) is not
+> independent human reliability. **G3** and **G4** are **PASSED** only on the billing_api
+> F1 `composer-2.5` seed-1 wording triple (D-48); the 144-run was **not** executed.
+> Pilot writeup: [`experiments/reports/pilot_report.md`](experiments/reports/pilot_report.md).
+> `make report` still writes the harness check (`pre_pilot_status`), not the 144-run.
 > In-matrix instructions are `REVIEWED`. `S_sec` and criticality catalog/attack YAML stay
-> provisional. `make report` writes a pre-pilot status file, not a 144-run result. A G4
-> construct check on scripted patches is in `experiments/reports/g4_calibration.md` and does
-> not set G4 to PASSED. **No LLM has been called and no experimental result exists.** A real
-> 144-run is refused until `CURSOR_API_KEY` is set (D-45). Isolation is still process-level.
+> provisional. Scripted G4 calibration is in `experiments/reports/g4_calibration.md`.
+> Live-diff G4 is `experiments/reports/g4_f1_live.md`. Default comparison still does not
+> call an LLM. Optional `make compare-baselines WITH_LLM=1` uses Cohere
+> (`COHERE_API_KEY`, never committed) on four diffs only (D-47). Isolation is still
+> process-level. `CURSOR_API_KEY` is required for a live cell and is never committed (D-45).
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source
@@ -31,12 +36,15 @@ make test             # project tests + each testbed's functional tests
 make baseline-all     # records testbeds/*/baseline/* (refuses to overwrite; FORCE=--force)
 make score TESTBED=billing_api   # baseline self-comparison report (a harness check, not a result)
 make run-pilot DRY_RUN=1         # validate the 144-run manifest; never calls an agent
+make score-matched               # IAE/IIF/SR/DG on billing_api F1 composer seed 1
 make compare-baselines           # G4 construct check on scripted patches; never calls an LLM
+make compare-live                # G4 on the three live F1 diffs; never calls an LLM
+make compare-baselines WITH_LLM=1  # four Cohere calls if COHERE_API_KEY is set (D-47)
 make g2-agreement                # G2 kappa; exits 2 until annotator_b.yaml is filled
-make report                      # pre-pilot status; exit 1 only on frozen-hash drift
+make report                      # harness check (pre_pilot_status) + pointer to pilot_report.md
 ```
 
-## Layout (Phase 5)
+## Layout
 
 ```text
 configs/{replay,experiment,agents,gates}.yaml
@@ -49,11 +57,12 @@ iide/scoring/                  metrics (spec 7, 13)
 iide/analysis/                 Phase 3 reports + Phase 5 comparison methods
 experiments/manifests/         144-run plan (JSONL)
 experiments/raw/               per-run artifacts (gitignored)
-experiments/reports/           G4 calibration + pre-pilot status (not 144-run results)
+experiments/reports/           pilot_report.md, F1 matched group, G4 live + calibration, pre_pilot_status
+docs/paper/                    restricted paper skeleton (methods / results / limitations)
 docs/g2/                       G2 construct pack (rubric, 28 vignettes, A1 labels; A2 pending)
 docs/reviews/                  S_sec, criticality, instruction worksheets (A2 pending)
-scripts/                       run_baseline.py, run_pilot.py, score_replays.py, score_runs.py, compare_baselines.py, score_g2.py, verify_reproducibility.py, export_review_packs.py
-configs/llm_reviewer.yaml      frozen LLM-diff prompt; command unset → UNAVAILABLE
+scripts/                       run_baseline.py, run_pilot.py, score_replays.py, score_runs.py, score_matched_group.py, compare_baselines.py, compare_live.py, score_g2.py, verify_reproducibility.py, export_review_packs.py
+configs/llm_reviewer.yaml      frozen LLM-diff prompt; live Cohere only with --with-llm
 ```
 
 See `REPRODUCIBILITY.md` for exact commands and environment details.

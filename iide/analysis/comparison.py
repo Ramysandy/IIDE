@@ -271,11 +271,31 @@ def _bandit_issue_count(exe: str, root: Path) -> tuple[int | None, str | None]:
     return len(results), None
 
 
-def llm_reviewer(diff_text: str) -> MethodResult:
-    """Fixed prompt, no oracle labels. UNAVAILABLE until a command is configured."""
+def llm_reviewer(diff_text: str, *, call_llm: bool = False) -> MethodResult:
+    """Fixed prompt, no oracle labels.
+
+    Default (``call_llm=False``) never hits the network so ``make compare-baselines``
+    stays deterministic. ``call_llm=True`` uses Cohere only when ``COHERE_API_KEY`` is
+    set; otherwise the method stays UNAVAILABLE and is not claimed as run.
+    """
     cfg = yaml.safe_load(LLM_REVIEWER_CONFIG.read_text(encoding="utf-8"))
-    command = cfg.get("command")
     prompt = cfg.get("prompt") or ""
+    if not call_llm:
+        return MethodResult(
+            method_id="llm_reviewer",
+            prediction="UNAVAILABLE",
+            available=False,
+            detail=(
+                "live LLM call disabled (pass --with-llm). Prompt is frozen and "
+                "contains no oracle labels; not claimed as run."
+            ),
+            numeric={"prompt_chars": len(prompt), "diff_chars": len(diff_text)},
+        )
+    if cfg.get("provider") == "cohere":
+        from iide.analysis.cohere_reviewer import review_diff
+
+        return review_diff(diff_text, cfg)
+    command = cfg.get("command")
     if not command:
         return MethodResult(
             method_id="llm_reviewer",
@@ -343,14 +363,19 @@ def confusion(method_id: str, rows: Sequence[tuple[str, int, MethodResult]]) -> 
     )
 
 
-def assess_g4(confusions: Sequence[Confusion], *, oracle_positives: int) -> G4Assessment:
+def assess_g4(
+    confusions: Sequence[Confusion],
+    *,
+    oracle_positives: int,
+    context: str = "the synthetic calibration suite",
+) -> G4Assessment:
     """Provisional construct check: did the oracle catch erosions a simpler method missed?"""
     if oracle_positives < 1:
         return G4Assessment(
             status="NOT_EVALUATED",
             oracle_positives=0,
             methods_that_missed_an_oracle_positive=[],
-            note="no oracle-positive calibration case; G4 cannot be assessed",
+            note="no oracle-positive case; G4 cannot be assessed",
         )
     missed = [c.method_id for c in confusions if c.fn > 0]
     # Functional tests and SAST are the spec's primary "simpler baselines".
@@ -361,10 +386,9 @@ def assess_g4(confusions: Sequence[Confusion], *, oracle_positives: int) -> G4As
             oracle_positives=oracle_positives,
             methods_that_missed_an_oracle_positive=missed,
             note=(
-                "On the synthetic calibration suite the replay oracle found confirmed "
+                f"On {context} the replay oracle found confirmed "
                 f"erosion that {', '.join(core_miss)} missed. This is a construct check, "
-                "not a 144-run finding; G4 stays NOT_EVALUATED for the pilot until real "
-                "agent runs exist."
+                "not a 144-run finding."
             ),
         )
     return G4Assessment(
@@ -372,9 +396,8 @@ def assess_g4(confusions: Sequence[Confusion], *, oracle_positives: int) -> G4As
         oracle_positives=oracle_positives,
         methods_that_missed_an_oracle_positive=missed,
         note=(
-            "Simpler baselines did not miss an oracle-positive on this calibration "
-            "suite; the claimed advantage of the replay oracle must be narrowed or "
-            "re-checked on a broader fixture set / the 144-run."
+            f"Simpler baselines did not miss an oracle-positive on {context}; "
+            "the claimed advantage of the replay oracle must be narrowed or re-checked."
         ),
     )
 
@@ -398,7 +421,12 @@ class ComparisonReport(_M):
 
 
 def build_report(
-    cases: Sequence[CasePrediction], *, label: str, note: str, limitations: Sequence[str]
+    cases: Sequence[CasePrediction],
+    *,
+    label: str,
+    note: str,
+    limitations: Sequence[str],
+    g4_context: str = "the synthetic calibration suite",
 ) -> ComparisonReport:
     method_ids = [m.method_id for m in cases[0].methods] if cases else []
     tables = []
@@ -407,7 +435,9 @@ def build_report(
             (c.case_id, c.oracle_y, next(m for m in c.methods if m.method_id == mid)) for c in cases
         ]
         tables.append(confusion(mid, rows))
-    g4 = assess_g4(tables, oracle_positives=sum(c.oracle_y for c in cases))
+    g4 = assess_g4(
+        tables, oracle_positives=sum(c.oracle_y for c in cases), context=g4_context
+    )
     return ComparisonReport(
         label=label,
         note=note,
@@ -416,3 +446,45 @@ def build_report(
         g4=g4,
         limitations=list(limitations),
     )
+
+
+def render_markdown(report: ComparisonReport) -> str:
+    lines = [
+        f"# {report.label}",
+        "",
+        report.note,
+        "",
+        f"- G4 status: **{report.g4.status}**",
+        f"- {report.g4.note}",
+        "",
+        "## Cases",
+        "",
+        "| Case | oracle y | class | functional | logger | literals | bandit | llm | ifg |",
+        "|---|---:|---|---|---|---|---|---|---|",
+    ]
+    order = [
+        "functional_tests",
+        "logger_call_diff",
+        "static_event_literals",
+        "sast_bandit",
+        "llm_reviewer",
+        "ifg_monitor",
+    ]
+    for c in report.cases:
+        by = {m.method_id: m.prediction for m in c.methods}
+        cells = " | ".join(by.get(k, "?") for k in order)
+        lines.append(f"| {c.case_id} | {c.oracle_y} | {c.oracle_class} | {cells} |")
+    lines += ["", "## Confusion vs confirmed erosion (y=1)", ""]
+    lines.append("| Method | TP | FP | FN | TN | una | recall | FPR | FN cases |")
+    lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---|")
+    for t in report.confusion:
+        rec = "n/a" if t.recall is None else f"{t.recall:.2f}"
+        fpr = "n/a" if t.fpr is None else f"{t.fpr:.2f}"
+        lines.append(
+            f"| {t.method_id} | {t.tp} | {t.fp} | {t.fn} | {t.tn} | {t.unavailable} | "
+            f"{rec} | {fpr} | {', '.join(t.false_negatives) or '—'} |"
+        )
+    lines += ["", "## Limitations", ""]
+    lines.extend(f"- {x}" for x in report.limitations)
+    lines.append("")
+    return "\n".join(lines)

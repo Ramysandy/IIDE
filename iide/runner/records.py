@@ -183,6 +183,18 @@ def write_record(record: RunRecord, directory: Path) -> Path:
     return path
 
 
+def load_primary_records(raw_dir: Path) -> list[RunRecord]:
+    """Primary attempt for every run_id under ``raw_dir`` (spec 12 / D-33)."""
+    out: list[RunRecord] = []
+    if not raw_dir.is_dir():
+        return out
+    for run_dir in sorted(p for p in raw_dir.iterdir() if p.is_dir()):
+        primary = select_primary(list_attempts(raw_dir, run_dir.name))
+        if primary is not None:
+            out.append(primary)
+    return out
+
+
 def select_primary(attempts: list[RunRecord]) -> RunRecord | None:
     """Pre-registered retry policy (D-33): the first attempt is primary unless every earlier
     attempt ended in INFRA_ERROR (a failure not attributable to the agent), in which case the

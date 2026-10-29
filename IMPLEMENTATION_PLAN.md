@@ -4,7 +4,7 @@ Authoritative source: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Suppor
 proposal review, novelty check) are in [`docs/`](docs/) as gitignored PDFs. The G1 memo is
 [`docs/g1_prior_art.md`](docs/g1_prior_art.md). Engineering choices are in [`DECISIONS.md`](DECISIONS.md).
 
-**Status legend:** `[x]` done and verified, `[ ]` not started. Nothing past Phase 5 is implemented.
+**Status legend:** `[x]` done and verified, `[ ]` not started. Phase 6 scale is not started. A Phase 7 analysis of the F1 composer seed-1 triple exists; it is not a 144-run.
 
 ## Repository state at start of Phase 1
 
@@ -19,9 +19,9 @@ no tests, not a git repository.
 | 1 | Minimal vertical slice: one endpoint, telemetry, one safe attack, one frozen rule, fresh-instance replay, baseline JSON | Rule fires consistently; flake rate under pilot threshold | `[x]` see below |
 | 2 | Two pilot testbeds (billing/auth, file portal), 10-20 events each, 6-12 attacks each, rule packs, baseline artifacts | **G2** (kappa >= 0.6) | `[x]` implemented; **G2 PASSED** (operator, D-44; κ=1.0 is not independent human reliability) |
 | 3 | Scoring library (RC, ED, LEI, IAE, IIF, SR, DG, CAI, ISP, NRG, Pareto), section 9 fixtures | Unit tests match hand calculations | `[x]` implemented and tested; bootstrap CIs deferred to Phase 7 |
-| 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[x]` harness + 144-row manifest + dry-run; **144-run not executed** (G2 open, agents unconfigured) |
-| 5 | Baselines and decision | **G4** | `[x]` construct check on scripted patches; **G4 NOT_EVALUATED** for the 144-run (no 144-run exists) |
-| 6-7 | Scale or pivot; analysis and paper | | `[ ]` |
+| 4 | Agent harness, manifest, 144-run pilot | **G3** (flake < 5%) | `[x]` harness + 144-row manifest; **F1 composer seed-1 triple scored; 144 not run** |
+| 5 | Baselines and decision | **G4** | `[x]` scripted calibration + G4 PASSED on the three live F1 diffs; **144 not run** |
+| 6-7 | Scale or pivot; analysis and paper | | `[ ]` Phase 6 not started. F1 matched-group + paper skeleton written (not 144). |
 
 ### Phase 0 task checklist
 
@@ -94,11 +94,12 @@ no tests, not a git repository.
 - [x] Neutral maintenance target `app/formatting.py` added to both testbeds; baselines re-recorded as `phase4-0.1`
 - [x] Workspace allowlist (app/, tests/, pytest.ini) and isolation checks; oracle artifacts never copied
 - [x] CodingAgent protocol, local_patch development adapter, generic command adapter
-- [x] Two Cursor command-adapter slots in `configs/agents.yaml` (D-45); live call needs `CURSOR_API_KEY`
+- [x] Two Cursor command-adapter slots in `configs/agents.yaml` (D-45); three live `composer-2.5` cells exist; `auto` was not run
 - [x] 144-run manifest (2 x 4 x 3 x 2 x 3) with stable run IDs; `make run-pilot DRY_RUN=1`
 - [x] Orchestration: build, frozen tests, replay, miss confirmation, scoring, run ledger, resumability
-- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, instructions are unreviewed, or command-adapter env is missing (G1/G2 PASSED; CURSOR_API_KEY not set)
-- [ ] **G3**: 144-run with real agents. **Not started.** Export `CURSOR_API_KEY` and `pip install 'iide[agents]'` first.
+- [x] Real 144-run start is refused while G1/G2 are open, agents are unconfigured, instructions are unreviewed, or command-adapter env is missing
+- [x] Cell filters (`--agent/--family/--variant/--seed/--testbed`) so a live run can skip `auto`
+- [x] **G3**: F1 composer seed-1 triple (`billing_api`); 144 not run. Operator PASSED (D-48).
 - [ ] Docker/network isolation still process-level (D-03/D-31)
 
 ### Phase 4 file map
@@ -108,7 +109,7 @@ no tests, not a git repository.
 | Instructions | `testbeds/<tb>/instructions/F{1,2,4,6}/{ambiguous,scoped,neutral}.yaml` |
 | Harness | `iide/runner/{agent_interface,workspace,local_patch_runner,command_agent,cursor_cli,manifest,orchestration,pilot,records,instructions,config}.py` |
 | Config | `configs/{experiment,agents,gates}.yaml` |
-| CLI | `scripts/run_pilot.py`, `scripts/score_runs.py`; `make manifest-pilot`, `make run-pilot DRY_RUN=1` |
+| CLI | `scripts/run_pilot.py` (cell filters), `scripts/score_runs.py`, `scripts/score_matched_group.py`; `make manifest-pilot`, `make run-pilot DRY_RUN=1` |
 | Schemas | `schemas/{instruction,run_record}.schema.json` |
 
 ### Phase 5 task checklist
@@ -118,13 +119,13 @@ no tests, not a git repository.
 - [x] Static signal-inventory (catalog event-type string literals vs frozen catalog)
 - [x] Dynamic signal-inventory (one replay; integration test on `filter_lockout`)
 - [x] SAST: Bandit run if CLI on PATH (still predicts `NONE` for this construct); CodeQL not found, not claimed
-- [x] LLM diff reviewer: frozen prompt, `command: null` → `UNAVAILABLE` (never invented)
+- [x] LLM diff reviewer: frozen prompt; default `UNAVAILABLE`; optional Cohere `--with-llm` (D-47; never invented)
 - [x] IFG-style monitor: `UNAVAILABLE` (not fair/reproducible in this budget)
 - [x] Confusion vs replay-oracle `y` on four scripted patches; report at `experiments/reports/g4_calibration.{md,json}`
 - [x] `filter_lockout` verified as confirmed oracle erosion with tests still passing
 - [x] `make report` / `scripts/verify_reproducibility.py` pre-pilot status (D-42); not a 144-run result
 - [x] Blinded review packs in `docs/reviews/` for `S_sec`, criticality, and instructions (A2 pending)
-- [ ] **G4 on the 144-run:** blocked (G2 open, agents unconfigured, 144-run not executed). `gates.yaml` G4 is `NOT_EVALUATED`.
+- [x] **G4 on live F1 diffs:** `scripts/compare_live.py` → `experiments/reports/g4_f1_live.{md,json}`. Operator PASSED (D-48). 144 not run. Scripted calibration remains a separate PROVISIONAL construct check.
 
 ### Phase 5 file map
 
@@ -132,12 +133,14 @@ no tests, not a git repository.
 |---|---|
 | Methods | `iide/analysis/comparison.py` |
 | Calibration fixtures | `iide/analysis/fixtures.py`, `tests/fixtures/local_patches/{erode_lockout,filter_lockout,erode_invoice_read,simplify_formatter}.yaml` |
-| LLM prompt (unconfigured) | `configs/llm_reviewer.yaml` |
-| CLI | `scripts/compare_baselines.py`; `make compare-baselines` |
-| Report | `experiments/reports/g4_calibration.{md,json}` |
-| Pre-pilot status | `iide/analysis/status.py`, `scripts/verify_reproducibility.py`; `make report` |
+| LLM prompt (Cohere env) | `configs/llm_reviewer.yaml`, `iide/analysis/cohere_reviewer.py` |
+| CLI | `scripts/compare_baselines.py`, `scripts/compare_live.py`; `make compare-baselines` / `WITH_LLM=1` |
+| Report | `experiments/reports/g4_calibration.{md,json}`, `g4_f1_live.{md,json}` |
+| Pre-pilot status | `iide/analysis/status.py`, `scripts/verify_reproducibility.py`; `make report` (harness check) |
+| Pilot report | `experiments/reports/pilot_report.md`; matched group `f1_composer_seed1.{md,json}` |
+| Paper skeleton | `docs/paper/` |
 | Human review packs | `docs/reviews/{s_sec,criticality,instructions}/`, `scripts/export_review_packs.py` |
-| Tests | `tests/unit/test_comparison_baselines.py`, `tests/integration/test_g4_calibration.py`, `tests/unit/test_pre_pilot_status.py`, `tests/unit/test_review_packs.py` |
+| Tests | `tests/unit/test_comparison_baselines.py`, `tests/unit/test_matched_and_live_g4.py`, `tests/unit/test_cohere_reviewer.py`, `tests/integration/test_g4_calibration.py`, `tests/unit/test_pre_pilot_status.py`, `tests/unit/test_review_packs.py` |
 
 ## Dependencies between phases
 
@@ -148,8 +151,8 @@ no tests, not a git repository.
 - Phase 4 needs a real workspace-isolation mechanism (spec 11.2). The harness copies an allowlisted
   workspace without oracle artifacts; the agent still runs as the same OS user and the network is not
   blocked (D-03/D-31). Upgrade before any untrusted-agent run.
-- Phase 5 compares simpler baselines to the replay oracle on **scripted** patches. It does not
-  substitute for G4 on a real 144-run (D-38, D-39).
+- Phase 5 compares simpler baselines to the replay oracle on **scripted** patches (D-38, D-39)
+  and, separately, on the three live F1 diffs (D-48). Neither substitutes for a 144-run.
 
 ## Risks
 
@@ -158,8 +161,8 @@ no tests, not a git repository.
 | Replay flake rate | Measured per attack and per testbed (k=5 baseline plus >= 30 calibration replays, D-05); re-measure after any change to frozen artifacts |
 | Process isolation is weaker than containers (no network block) | Documented in D-03/D-31; workspace has no oracle artifacts; Docker daemon is not running; upgrade before untrusted-agent runs |
 | Agents may change telemetry transport (e.g. library migration F5) | Harness contract is `create_app(sink=...)` plus `Telemetry.emit`; F5 is out of the Phase 4 family set (D-32) until D-03a is resolved |
-| Flake-rate definition is not given by the spec | Interpretation chosen and tested (D-05); confirm before G3 |
+| Flake-rate definition is not given by the spec | Interpretation chosen and tested (D-05); G3 used this formula (D-48) |
 | Security-bearing labels and criticality are provisional | Worksheets in `docs/reviews/` (D-42); A2 still pending (D-10, D-19). G2 construct labels are a separate pack. |
 | ATT&CK mapping is unverified (some attacks `UNMAPPED`) | Marked in each attack definition; validate before publication |
 | Novelty gap unverified | Sweep recorded (D-40); recommended GO; G1 PASSED 2026-10-28; no novelty claim is made |
-| G4 construct check ≠ G4 on the experiment | Calibration report is `PROVISIONAL`; `gates.yaml` G4 stays `NOT_EVALUATED` until a real 144-run exists (D-39) |
+| G4 construct check ≠ G4 on a 144-run | Scripted calibration is `PROVISIONAL` (D-39). Operator set G4 PASSED on the three live F1 diffs only (D-48). 144 not run. |

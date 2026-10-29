@@ -26,6 +26,8 @@ def test_redact_strips_known_secrets_and_key_patterns():
     assert "Bearer abc" not in cleaned
     assert "supersecret-value" not in redact("x supersecret-value y", secrets=["supersecret-value"])
     assert "[REDACTED]" in cleaned
+    cohere = "cohere_testplaceholderkeyvalue0000000000"
+    assert cohere not in redact(f"key={cohere}")
 
 
 def test_local_patch_applies_an_anchor_and_refuses_to_escape(tmp_path):

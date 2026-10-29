@@ -10,6 +10,7 @@ from __future__ import annotations
 import difflib
 import hashlib
 import shutil
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -152,6 +153,23 @@ def allowlisted_files(root: Path) -> list[Path]:
             if p.is_file() and not (set(p.relative_to(root).parts) & EXCLUDED_DIRS):
                 out[p.relative_to(root).as_posix()] = p
     return [out[k] for k in sorted(out)]
+
+
+def apply_unified_diff(workspace: Path, diff_text: str) -> None:
+    """Apply a ``a/`` ``b/`` unified diff produced by ``diff_against`` onto ``workspace``."""
+    if not (diff_text or "").strip():
+        return
+    proc = subprocess.run(
+        ["patch", "-p1", "--forward", "--batch"],
+        cwd=workspace,
+        input=diff_text,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout or "").strip() or f"exit {proc.returncode}"
+        raise ValueError(f"patch failed: {detail}")
 
 
 def build_candidate_root(oracle_root: Path, workspace: Path, dest: Path) -> Path:

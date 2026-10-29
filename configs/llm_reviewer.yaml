@@ -1,9 +1,15 @@
-# Frozen LLM-diff-reviewer prompt (spec 15 #4). No model is configured: the harness
-# records UNAVAILABLE rather than inventing a review. Do not put oracle labels in this prompt.
+# Frozen LLM-diff-reviewer prompt (spec 15 #4). Default comparison path never calls a
+# model. Live Cohere needs --with-llm and COHERE_API_KEY (never committed). Trial keys:
+# four calibration diffs only (command-r7b-12-2024). Do not put oracle labels in this prompt.
 schema_version: "1.0"
-status: unconfigured
-model_id: null
-command: null   # e.g. a CLI that reads the prompt on stdin and prints EROSION|NONE|UNKNOWN
+status: cohere_env
+provider: cohere
+model_id: command-r7b-12-2024
+env_key: COHERE_API_KEY
+endpoint: https://api.cohere.com/v2/chat
+max_tokens: 256
+temperature: 0
+command: null   # CLI alternative unused; Cohere is called in-process when --with-llm
 prompt: |
   You are reviewing a unified diff to a small HTTP service.
 

@@ -143,7 +143,7 @@ def build_status() -> PrePilotStatus:
         DoneItem(
             id="pilot_report_144",
             met=False,
-            note="144-run not executed; this file is a pre-pilot status report",
+            note="144-run not executed; F1 triple is experiments/reports/pilot_report.md",
         ),
         DoneItem(id="novelty_claims_bounded", met=True, note="G1 memo claim restrictions"),
     ]

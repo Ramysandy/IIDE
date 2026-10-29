@@ -6,6 +6,7 @@ Not 144-run results. filter_lockout is a new mutation and is oracle-checked here
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 
@@ -103,3 +104,29 @@ def test_compare_baselines_script_writes_a_provisional_g4_report(tmp_path):
     assert logger["ifg_monitor"] == "UNAVAILABLE"
     fn = next(c for c in data["confusion"] if c["method_id"] == "functional_tests")
     assert fn["fn"] >= 2  # both lockout mutations
+
+
+def test_compare_baselines_with_llm_without_key_stays_unavailable(tmp_path):
+    out = tmp_path / "reports"
+    env = {k: v for k, v in os.environ.items() if k != "COHERE_API_KEY"}
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(REPO_ROOT / "scripts" / "compare_baselines.py"),
+            "--with-llm",
+            "--output-dir",
+            str(out),
+        ],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+        env=env,
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert (out / "g4_llm_reviewer.json").is_file()
+    assert not (out / "g4_calibration.json").exists()
+    data = json.loads((out / "g4_llm_reviewer.json").read_text())
+    by_case = {c["case_id"]: c for c in data["cases"]}
+    llm = {m["method_id"]: m for m in by_case["filter_lockout"]["methods"]}["llm_reviewer"]
+    assert llm["prediction"] == "UNAVAILABLE"
+    assert "COHERE_API_KEY" in llm["detail"]

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 
@@ -15,6 +16,8 @@ def test_pre_pilot_status_is_blocked_and_honest(monkeypatch):
     assert status.ready_for_144_run is False
     assert status.gates["G1"] == "PASSED"
     assert status.gates["G2"] == "PASSED"
+    assert status.gates["G3"] == "PASSED"
+    assert status.gates["G4"] == "PASSED"
     assert status.g2_status == "MEETS_THRESHOLD"
     assert status.n_unconfigured_agents == 0
     assert status.n_unreviewed_instructions == 0
@@ -29,6 +32,8 @@ def test_pre_pilot_status_is_blocked_and_honest(monkeypatch):
 
 
 def test_verify_reproducibility_script_writes_a_report(tmp_path):
+    env = os.environ.copy()
+    env.pop("CURSOR_API_KEY", None)
     proc = subprocess.run(
         [
             sys.executable,
@@ -39,6 +44,7 @@ def test_verify_reproducibility_script_writes_a_report(tmp_path):
         capture_output=True,
         text=True,
         cwd=REPO_ROOT,
+        env=env,
     )
     assert proc.returncode == 0, proc.stderr
     assert "Ready for 144-run: **False**" in proc.stdout
