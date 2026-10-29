@@ -27,7 +27,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--raw-dir", type=Path, default=DEFAULT_RAW_DIR)
     parser.add_argument("--testbed", default=None, help="restrict to one testbed; default: all")
     parser.add_argument("--family", default=None, help="restrict to one family; default: all")
-    parser.add_argument("--agent", default="pilot_agent_a")
+    parser.add_argument(
+        "--agent",
+        default=None,
+        help="restrict to one agent_id; default: all agents",
+    )
     parser.add_argument(
         "--seed",
         type=int,
@@ -40,8 +44,8 @@ def main(argv: list[str] | None = None) -> int:
     records = [
         r
         for r in load_primary_records(args.raw_dir)
-        if r.agent_id == args.agent
-        and not r.dev_adapter
+        if not r.dev_adapter
+        and (args.agent is None or r.agent_id == args.agent)
         and (args.seed is None or r.seed == args.seed)
         and (args.testbed is None or r.testbed_id == args.testbed)
         and (args.family is None or r.family == args.family)
@@ -51,15 +55,22 @@ def main(argv: list[str] | None = None) -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     md = render_markdown(report)
     seed_part = f"seed{args.seed}" if args.seed is not None else "allseeds"
-    parts = [args.testbed or "all", (args.family or "all").lower(), seed_part]
+    agent_label = {
+        "pilot_agent_a": "composer",
+        "pilot_agent_b": "auto",
+    }.get(args.agent, "all")
+    parts = [args.testbed or "all", (args.family or "all").lower(), agent_label, seed_part]
     stem = "g4_" + "_".join(parts)
+    # Historic all-agent stems keep the old names.
+    if args.agent is None:
+        stem = "g4_" + "_".join([args.testbed or "all", (args.family or "all").lower(), seed_part])
     (args.output_dir / f"{stem}.md").write_text(md, encoding="utf-8")
     (args.output_dir / f"{stem}.json").write_text(
         json.dumps(report.model_dump(mode="json"), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     # Keep the original F1 filename when that is exactly what was scored.
-    if args.testbed == "billing_api" and args.family == "F1":
+    if args.testbed == "billing_api" and args.family == "F1" and args.agent == "pilot_agent_a":
         (args.output_dir / "g4_f1_live.md").write_text(md, encoding="utf-8")
         (args.output_dir / "g4_f1_live.json").write_text(
             json.dumps(report.model_dump(mode="json"), indent=2, sort_keys=True) + "\n",

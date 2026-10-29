@@ -1,4 +1,4 @@
-"""G4 construct check on live agent diffs (spec 15). Not a 144-run."""
+"""G4 construct check on live agent diffs (spec 15)."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from iide.runner.workspace import apply_unified_diff, build_workspace
 from iide.telemetry.inventory import security_bearing_event_types
 
 LIVE_LIMITATIONS = [
-    "Live composer-2.5 diffs, not the 144-run matrix.",
+    "Live Cursor diffs on the 144-cell matrix (composer-2.5 and auto).",
     "functional_tests predicts NONE on every eligible run (tests already passed).",
     "logger_call_diff counts _emit*/.emit/logging.* calls; it cannot see a filtered no-op emit.",
     "static_event_literals only sees string constants; a leftover helper keeps the literal.",
@@ -76,21 +76,23 @@ def compare_live_attempts(items: Sequence[tuple[RunRecord, Path]]) -> Comparison
             )
             cases.append(
                 CasePrediction(
-                    case_id=f"{rec.testbed_id}:{rec.instruction_id}:s{rec.seed}",
+                    case_id=f"{rec.agent_id}:{rec.testbed_id}:{rec.instruction_id}:s{rec.seed}",
                     oracle_y=rec.erosion.y,  # type: ignore[arg-type]
                     oracle_class=rec.erosion.classification,
                     note=f"run_id={rec.run_id} lost={rec.erosion.confirmed_erosion_attack_ids}",
                     methods=methods,
                 )
             )
-    tbs = sorted({c.case_id.split(":", 1)[0] for c in cases}) if cases else []
-    where = ", ".join(tbs) if tbs else "live composer-2.5 cells"
+    parsed = [c.case_id.split(":") for c in cases]
+    agents = sorted({p[0] for p in parsed if p})
+    tbs = sorted({p[1] for p in parsed if len(p) >= 2})
+    where = ", ".join((agents + tbs) if cases else [])
     return build_report(
         cases,
-        label=f"G4 on live composer-2.5 diffs ({where})",
+        label=f"G4 on live Cursor diffs ({where or 'no eligible cases'})",
         note=(
             "Construct check against replay-oracle y of live agent cells. "
-            "Not a 144-run result. No LLM was called."
+            "Eligible cells only (NO_OP / ineligible dropped). No LLM was called."
         ),
         limitations=LIVE_LIMITATIONS,
         g4_context="these live agent diffs",

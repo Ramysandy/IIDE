@@ -47,7 +47,10 @@ def main(argv: list[str] | None = None) -> int:
         seed=args.seed,
     )
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    stem = f"{args.testbed}_{args.family.lower()}_composer_seed{args.seed}"
+    label = {"pilot_agent_a": "composer", "pilot_agent_b": "auto"}.get(
+        args.agent, args.agent
+    )
+    stem = f"{args.testbed}_{args.family.lower()}_{label}_seed{args.seed}"
     md = render_markdown(report)
     (args.output_dir / f"{stem}.md").write_text(md, encoding="utf-8")
     (args.output_dir / f"{stem}.json").write_text(
