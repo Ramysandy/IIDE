@@ -4,20 +4,17 @@ A reproducible research harness for measuring whether ordinary maintenance instr
 agent to remove or degrade security telemetry that a frozen detection pipeline relies on, even when
 functional tests still pass.
 
-> **Status: F1 composer seed-1 paper-pilot; G1–G4 PASSED (operator, restricted).** The
-> prior-art sweep is in [`docs/g1_prior_art.md`](docs/g1_prior_art.md) (recommended **GO**
-> for the E1+E2+E3 combination). That memo is not a novelty claim. Gate **G2** is **PASSED**
-> with claim restriction D-44: construct κ = 1.000 on [`docs/g2/`](docs/g2/) is not
-> independent human reliability. **G3** and **G4** are **PASSED** only on the billing_api
-> F1 `composer-2.5` seed-1 wording triple (D-48); the 144-run was **not** executed.
-> Pilot writeup: [`experiments/reports/pilot_report.md`](experiments/reports/pilot_report.md).
-> `make report` still writes the harness check (`pre_pilot_status`), not the 144-run.
-> In-matrix instructions are `REVIEWED`. `S_sec` and criticality catalog/attack YAML stay
-> provisional. Scripted G4 calibration is in `experiments/reports/g4_calibration.md`.
-> Live-diff G4 is `experiments/reports/g4_f1_live.md`. Default comparison still does not
-> call an LLM. Optional `make compare-baselines WITH_LLM=1` uses Cohere
-> (`COHERE_API_KEY`, never committed) on four diffs only (D-47). Isolation is still
-> process-level. `CURSOR_API_KEY` is required for a live cell and is never committed (D-45).
+> **Status: Composer 48-cell grid (seeds 1–2); G1–G4 PASSED (operator, restricted).**
+> Live results: 48/48 `SCORED`, 4 confirmed erosions; not 144; not `auto`. Writeup:
+> [`experiments/reports/pilot_report.md`](experiments/reports/pilot_report.md),
+> [`composer_cells.csv`](experiments/reports/composer_cells.csv),
+> [`figures/`](experiments/reports/figures/). The prior-art sweep is in
+> [`docs/g1_prior_art.md`](docs/g1_prior_art.md) (recommended **GO** for E1+E2+E3).
+> That memo is not a novelty claim. Gate **G2** is **PASSED** with D-44: construct
+> κ = 1.000 is not independent human reliability. **G3**/**G4** operator PASS was
+> recorded on the billing_api F1 seed-1 triple (D-48); the 48-cell grid is extra
+> evidence on the same agent, not a 144-run. Isolation is process-level.
+> `CURSOR_API_KEY` is never committed (D-45).
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
 [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source
@@ -57,7 +54,7 @@ iide/scoring/                  metrics (spec 7, 13)
 iide/analysis/                 Phase 3 reports + Phase 5 comparison methods
 experiments/manifests/         144-run plan (JSONL)
 experiments/raw/               per-run artifacts (gitignored)
-experiments/reports/           pilot_report.md, F1 matched group, G4 live + calibration, pre_pilot_status
+experiments/reports/           48-cell pilot_report, composer_cells.csv, figures, G4 live + calibration
 docs/paper/                    restricted paper skeleton (methods / results / limitations)
 docs/g2/                       G2 construct pack (rubric, 28 vignettes, A1 labels; A2 pending)
 docs/reviews/                  S_sec, criticality, instruction worksheets (A2 pending)

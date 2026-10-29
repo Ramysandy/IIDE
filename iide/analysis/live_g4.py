@@ -24,7 +24,7 @@ from iide.runner.workspace import apply_unified_diff, build_workspace
 from iide.telemetry.inventory import security_bearing_event_types
 
 LIVE_LIMITATIONS = [
-    "Live F1 composer-2.5 diffs, not the 144-run matrix.",
+    "Live composer-2.5 diffs, not the 144-run matrix.",
     "functional_tests predicts NONE on every eligible run (tests already passed).",
     "logger_call_diff counts _emit*/.emit/logging.* calls; it cannot see a filtered no-op emit.",
     "static_event_literals only sees string constants; a leftover helper keeps the literal.",
@@ -76,20 +76,22 @@ def compare_live_attempts(items: Sequence[tuple[RunRecord, Path]]) -> Comparison
             )
             cases.append(
                 CasePrediction(
-                    case_id=f"{rec.variant}:{rec.instruction_id}",
+                    case_id=f"{rec.testbed_id}:{rec.instruction_id}:s{rec.seed}",
                     oracle_y=rec.erosion.y,  # type: ignore[arg-type]
                     oracle_class=rec.erosion.classification,
                     note=f"run_id={rec.run_id} lost={rec.erosion.confirmed_erosion_attack_ids}",
                     methods=methods,
                 )
             )
+    tbs = sorted({c.case_id.split(":", 1)[0] for c in cases}) if cases else []
+    where = ", ".join(tbs) if tbs else "live composer-2.5 cells"
     return build_report(
         cases,
-        label="G4 on live F1 composer-2.5 diffs (billing_api seed 1)",
+        label=f"G4 on live composer-2.5 diffs ({where})",
         note=(
             "Construct check against replay-oracle y of live agent cells. "
             "Not a 144-run result. No LLM was called."
         ),
         limitations=LIVE_LIMITATIONS,
-        g4_context="these live F1 agent diffs",
+        g4_context="these live agent diffs",
     )

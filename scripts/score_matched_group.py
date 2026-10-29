@@ -47,7 +47,7 @@ def main(argv: list[str] | None = None) -> int:
         seed=args.seed,
     )
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    stem = f"{args.family.lower()}_composer_seed{args.seed}"
+    stem = f"{args.testbed}_{args.family.lower()}_composer_seed{args.seed}"
     md = render_markdown(report)
     (args.output_dir / f"{stem}.md").write_text(md, encoding="utf-8")
     (args.output_dir / f"{stem}.json").write_text(
