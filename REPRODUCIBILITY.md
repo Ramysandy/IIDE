@@ -80,15 +80,20 @@ not overwritten. Output:
 | `experiments/reports/g4_llm_reviewer.md` | Same table after `--with-llm` (Cohere; not a 144-run) |
 | `experiments/reports/g4_llm_reviewer.json` | Same payload; `llm_reviewer.detail` is redacted |
 | `experiments/reports/g4_f1_live.md` | G4 on the three live F1 composer diffs (no LLM) |
+| `experiments/reports/g4_all_all_allseeds.md` | G4 on 141 eligible live diffs (both agents; no LLM) |
 | `experiments/reports/f1_composer_seed1.md` | IAE/IIF/SR/DG on billing_api-F1 seed 1 (no CIs) |
-| `experiments/reports/pilot_report.md` | Paper-facing F1 pilot report (not 144) |
+| `experiments/reports/pilot_report.md` | Paper-facing 144-cell report |
+| `experiments/reports/pilot_cells.csv` | 144 primary cells |
+| `docs/THESIS_CLOSEOUT_PLAN.md` | Thesis gate close-out checklist |
 
-Scripted calibration is a **construct check**, not a 144-run finding. Regenerating
-`g4_calibration.*` overwrites the previous derived files; the labels live in
-`iide/analysis/fixtures.py`. Live F1 diffs are scored by `scripts/compare_live.py`
-(`make compare-live`) into `g4_f1_live.{md,json}`. Operator set G4 PASSED on those
-live diffs only (D-48); the analysis module still labels the construct check
-`PROVISIONAL`. The 144-run was not executed.
+Scripted calibration is a **construct check**. Regenerating `g4_calibration.*`
+overwrites the previous derived files; the labels live in `iide/analysis/fixtures.py`.
+Live diffs are scored by `scripts/compare_live.py` into `g4_f1_live.*` (original n=3)
+and `g4_all_all_allseeds.*` (141 eligible cells). Operator set G4 PASSED on the
+three F1 diffs (D-48); the 144 comparison is extra evidence
+([`docs/gates/g4_full_pilot_reassessment.md`](docs/gates/g4_full_pilot_reassessment.md)).
+The analysis module still labels the construct check `PROVISIONAL`.
+The 144-run **was executed** (141 scored, 3 NO_OP). Raw diffs stay gitignored.
 
 ## Freeze policy
 
@@ -102,12 +107,13 @@ baseline was recorded. Fixing that requires a new baseline under a new `experime
 
 - Replays and agent runs are isolated by a fresh process, not a container; outbound network is not blocked (D-03, D-31).
 - Criticality, `security_bearing` labels and ATT&CK mappings are provisional (D-10, D-19).
-- In-matrix instructions are REVIEWED (D-44). The 144-run has not been executed (D-35). The F1 composer seed-1 triple has (D-48).
-- G4 scripted calibration is D-38/D-39. G4 on the three live F1 diffs is D-48 (`gates.yaml` PASSED for those diffs only).
+- In-matrix instructions are REVIEWED (D-44). The 144-run **was executed** (141 scored, 3 empty-patch NO_OP). Isolation remains process-level (D-03/D-31); outbound network is not blocked.
+- G4 scripted calibration is D-38/D-39. G4 operator PASS on the three live F1 diffs is D-48. Full-pilot recount is `docs/gates/g4_full_pilot_reassessment.md`.
 - G1 sweep is in `docs/g1_prior_art.md` (D-40). Recommended GO; operator set G1 PASSED 2026-10-28.
-- G2 construct pack is `docs/g2/` (D-41–D-44). A2 is filled; construct κ = 1.000; operator set G2 PASSED with the restriction that this is not independent human reliability. `S_sec` and criticality catalog/attack YAML remain provisional.
+- G2 construct pack is `docs/g2/` (D-41–D-44). Assistant A2 is filled; construct κ = 1.000 is not independent human reliability. Human template: `docs/g2/annotator_human.yaml` (INCOMPLETE until a person fills it).
+- `S_sec` and criticality catalog/attack YAML remain provisional. Freeze memo: `docs/gates/definition_freeze.md`.
 - `make report` is a harness check (D-42). The paper-facing pilot report is `experiments/reports/pilot_report.md`.
-- Cursor command adapters are configured (D-45). Three live `composer-2.5` cells exist; `auto` was not called. A 144-run still needs `CURSOR_API_KEY`.
+- Cursor command adapters ran `composer-2.5` and `auto` (D-45). `CURSOR_API_KEY` is never committed. `seed_honored` is false.
 - Cell-filtered live example (restores `pilot.jsonl` timestamps after; never commit the key):
   `python scripts/run_pilot.py --testbed billing_api --family F1 --variant scoped --agent pilot_agent_a --seed 1`
 - Optional Cohere LLM reviewer is D-47. It is not a coding agent and does not replace Cursor.

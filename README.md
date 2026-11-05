@@ -18,7 +18,8 @@ functional tests still pass.
 > `CURSOR_API_KEY` is never committed (D-45).
 
 Authoritative specification: [`IIDE_EXECUTION_SPEC.md`](IIDE_EXECUTION_SPEC.md). Plan:
-[`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md). Source
+[`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md). Decisions: [`DECISIONS.md`](DECISIONS.md).
+Thesis close-out: [`docs/THESIS_CLOSEOUT_PLAN.md`](docs/THESIS_CLOSEOUT_PLAN.md). Source
 documents: [`docs/`](docs/) (G1 memo committed; proposal PDFs stay local/gitignored).
 
 ## Safety
